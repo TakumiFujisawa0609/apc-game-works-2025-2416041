@@ -6,8 +6,7 @@
 
 GameClear::GameClear(void)
 {
-	imgClear_, imgFramehover_, imgHomeDefault_,
-		imgNextDefault_, imgReplayDefault_ = -1;
+	
 
 }
 
@@ -24,8 +23,7 @@ void GameClear::Init(void)
 void GameClear::Update(void)
 {
 
-	InputManager& ins = InputManager::GetInstance();
-	SceneManager& sce = SceneManager::GetInstance();
+	
 
 }
 

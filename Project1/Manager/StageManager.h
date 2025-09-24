@@ -1,58 +1,93 @@
 #pragma once
+#include "../StDefineData.h"
+#include "../Common/Vector2.h"
+#include "../Application.h"
 
-#include "../Scene/SceneBase.h"
-
-struct Button {
-	int x, y;
-	const char* label;
-};
-
-class StageManager : public SceneBase
+class StageManager
 {
 public:
+	static constexpr int MAP_CHIP_SIZE_WID = 32; // マップチップ
+	static constexpr int MAP_CHIP_SIZE_HIG = 32; // マップチップの縦サイズ
+	static constexpr int MAP_CHIP_NUMS_X = 9; // マップチップ画像内の素材の横数
+	static constexpr int MAP_CHIP_NUMS_Y = 9; // マップチップ画像内の素材の縦数
+	static constexpr int MAP_CHIP_ALL_NUM = (MAP_CHIP_NUMS_X * MAP_CHIP_NUMS_Y);
 
-	// ステージID
-	enum class STAGE_ID
-	{
-		NONE,
-		STAGE1,
-		STAGE2,
-		STAGE3,
-		MAX,
+	// マップチップ画像内の素材の総数
+	static constexpr int MAP_GROUND_NUM_X = 30; // 地上のマップサイズ横
+	static constexpr int MAP_GROUND_NUM_Y = 30; // 地上のマップサイズ縦
+
+	static constexpr int MAP_UNGROUND_NUM_X = 10; // 地上のマップサイズ横
+	static constexpr int MAP_UNGROUND_NUM_Y = 10; // 地上のマップサイズ縦
+
+	static constexpr int DSP_CHIP_NUM_X = Application::SCREEN_SIZE_X / MAP_CHIP_SIZE_WID;
+	static constexpr int DSP_CHIP_NUM_Y = Application::SCREEN_SIZE_Y / MAP_CHIP_SIZE_HIG + 1;
+
+	static constexpr int MAP_SIZE_WID = MAP_CHIP_SIZE_WID * MAP_GROUND_NUM_X; // マップの横サイズ
+	static constexpr int MAP_SIZE_HIG = MAP_CHIP_SIZE_HIG * MAP_GROUND_NUM_Y; // マップの縦サイズ
+
+	static constexpr int MAP_MAX_NUM_X = 50;
+	static constexpr int MAP_MAX_NUM_Y = 50;
+
+	static constexpr int  MAP_CHIP_STAIR_NO = 15;
+
+	bool LoadGroundData(void); // 外部ファイルからマップデータを読み込む
+	bool LoadUnderGroundData(void);
+
+	// ゲッター・セッター関数
+	void MoveMapToUpper(int mov); // マップの上方向に移動(画面は下にスクロール)
+	void MoveMapToDown(int mov); // マップの下方向に移動(画面は上にスクロール)
+	void MoveMapToLeft(int mov); // マップの左方向に移動(画面は右にスクロール)
+	void MoveMapToRight(int mov); // マップの右方向に移動(画面は左にスクロール)
+
+
+
+	enum class MAP_TYPE {
+		E_MTYPE_NON = -1,
+		E_MIYPE_GROUND,
+		E_MIYPE_UNDER_GROUND,
+
+		E_MTYPE_MAX,
 	};
 
-	static constexpr int SELECT_STAGE_X = 264;
-	static constexpr int SELECT_STAGE_Y = 440;
+	StageManager(void); // コンストラクタ
+	~StageManager(void); // デストラクタ
 
-	const int BUTTON_X = SELECT_STAGE_X;
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 
-	// ボタンのレイアウト設定
-	const int buttonCount = 2;
 
-	// ボタン間のスペース
-	const int SPACE = 60;
 
-	// コンストラクタ
-	StageManager(void);
-	// デストラクタ
-	~StageManager(void);
+	Vector2 GetMapDispStPos(void) { return mapDispStPos; }
+	int GetMapChipNo(Vector2 mPos);
+	Vector2 GetDispMapSize(void) { return dispMapSize; }
+	StageManager::MAP_TYPE GetMapType(void) { return mapType; }
+	bool IsStair(Vector2 mapPos) {
+		if (GetMapChipNo(mapPos) == MAP_CHIP_STAIR_NO)return true;
+		return false;
+	}
 
-	void Init(void) override;
-	void Update(void) override;
-	void Draw(void) override;
-	void Release(void) override;
+	void ChangeMap(MAP_TYPE mtype);
 
 private:
-	bool IsMouseOver(const Button& btn);   // マウスがボタンの上にあるか
 
-	// ステージID
-	STAGE_ID stageId_;
+	int imgMapChipArray[MAP_CHIP_ALL_NUM]; // マップチップの画像ハンドル番号テーブル
 
-	int buttonDefaultImage;    // 通常ボタン画像
-	int buttonHoverImage;      // ホバーボタン画像
+	int dispMapDat[MAP_MAX_NUM_Y][MAP_MAX_NUM_X];
 
-	Button stageButtons[3];    // ステージボタン（3つ）
+	Vector2 dispMapSize;
 
-	int prevMouseInput_;
+	MAP_TYPE mapType;
+
+	// 地上マップデータ
+	int groundMapDat[MAP_GROUND_NUM_Y][MAP_GROUND_NUM_X];
+
+	int underGroundMapDat[MAP_UNGROUND_NUM_Y][MAP_UNGROUND_NUM_X];
+
+	Vector2 mapDispStPos; // マップ表示開始座標 
+
+	void ClearDispMap(void);
 
 };

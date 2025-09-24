@@ -1,30 +1,32 @@
 #pragma once
 #include "SceneBase.h"
-class SceneManager;
+#include "../StDefineData.h"
+class TitleScene
+{
+public:
+	static constexpr int TITLE_SIZE_WID = 600;
+	static constexpr int TITLE_SIZE_HIG = 250;
 
-	class TitleScene : public SceneBase
-	{
+	TitleScene(void);
+	~TitleScene(void);
 
-	public:
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 
-		// コンストラクタ
-		TitleScene(void);
+	E_SCENE_ID GetNextSceneID(void);
 
-		// デストラクタ
-		~TitleScene(void);
+private:
+	int bgImage;
 
-		void Init(void) ;
-		void Update(void);
-		void Draw(void) ;
-		void Release(void) ;
+	E_SCENE_ID nextSceneID;
 
-	private:
+	int prevSpaceKey;
+	int nowSpaceKey;
 
-		// 画像
-		int imgTitle_;
 
-		bool isGameOver_;		//ゲームオーバー
-		bool isGameClear_;		//ゲームクリア
-	};
+};
 
 

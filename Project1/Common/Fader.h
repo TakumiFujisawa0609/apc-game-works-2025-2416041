@@ -1,45 +1,26 @@
 #pragma once
+#include "../StDefineData.h"
 class Fader
 {
 public:
+	static constexpr float FADE_SPEED_ALPHA = 2; // フェードの速さ
 
-	// フェードが進む速さ
-	static constexpr float SPEED_ALPHA = 5.0f;
+	Fader(void); // コンストラクタ
+	~Fader(void); // デストラクタ
 
-	// 状態
-	enum class STATE
-	{
-		NONE,
-		FADE_OUT,	// 徐々に暗転
-		FADE_IN		// 徐々に明転
-	};
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 
-	// 状態の取得
-	STATE GetState(void) const;
-
-	// フェード処理が終了しているか
-	bool IsEnd(void) const;
-
-	// 指定フェードを開始する
-	void SetFade(STATE state);
-
-	void Init(void);
-	void Update(void);
-	void Draw(void);
-
+	// ゲッター・セッター関数
+	E_FADE_STAT_ID GetNowState(void) { return stat; }
+	bool IsEnd(void) { return endFlg; }
+	void SetFade(E_FADE_STAT_ID id);
 private:
-
-	// 状態
-	STATE state_;
-
-	// 透明度
-	float alpha_;
-
-	// 状態(STATE)を保ったまま終了判定を行うため、
-	// Update->Draw->Updateの1フレーム判定用
-	bool isPreEnd_;
-
-	// フェード処理の終了判定
-	bool isEnd_;
+	E_FADE_STAT_ID stat; // ステータス
+	float alpha; // アルファ値用の変数
+	bool endFlg; // フェード処理終了フラグ(true=未実行/false=実行中)
 };
 

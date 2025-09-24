@@ -1,102 +1,84 @@
 #include <DxLib.h>
-#include "../Application.h"
 #include "Fader.h"
-
-Fader::STATE Fader::GetState(void) const
+#include "../Application.h"
+Fader::Fader(void)
 {
-	return state_;
 }
-
-bool Fader::IsEnd(void) const
+Fader::~Fader(void)
 {
-	return isEnd_;
 }
-
-void Fader::SetFade(STATE state)
+// 初期化処理(最初の１回のみ実行)
+bool Fader::SystemInit(void)
 {
-	state_ = state;
-	if (state_ != STATE::NONE)
-	{
-		isPreEnd_ = false;
-		isEnd_ = false;
-	}
+	GameInit();
+	return true;
 }
-
-void Fader::Init(void)
+// ゲーム起動・再開時に必ず呼び出す処理
+void Fader::GameInit(void)
 {
-	state_ = STATE::NONE;
-	alpha_ = 0;
-	isPreEnd_ = true;
-	isEnd_ = true;
+	stat = E_STAT_FADE_NON;
+	alpha = 0.0f;
+	endFlg = true;
 }
-
+// 更新処理
 void Fader::Update(void)
 {
+	if (endFlg)return;
 
-	if (isEnd_)
-	{
+	switch (stat) {
+	case E_STAT_FADE_NON:
 		return;
-	}
-
-	switch (state_)
-	{
-	case STATE::NONE:
-		return;
-
-	case STATE::FADE_OUT:
-		alpha_ += SPEED_ALPHA;
-		if (alpha_ > 255)
-		{
-			// フェード終了
-			alpha_ = 255;
-			if (isPreEnd_)
-			{
-				// 1フレーム後(Draw後)に終了とする
-				isEnd_ = true;
-			}
-			isPreEnd_ = true;
-		}
-
-		break;
-
-	case STATE::FADE_IN:
-		alpha_ -= SPEED_ALPHA;
-		if (alpha_ < 0)
-		{
-			// フェード終了
-			alpha_ = 0;
-			if (isPreEnd_)
-			{
-				// 1フレーム後(Draw後)に終了とする
-				isEnd_ = true;
-			}
-			isPreEnd_ = true;
+	case E_STAT_FADE_OUT:
+		alpha += FADE_SPEED_ALPHA;
+		if (alpha > 255.0f) {
+			// フェードアウト終了
+			alpha = 255.0f;
+			endFlg = true;
+			stat = E_STAT_FADE_NON;
 		}
 		break;
+	case E_STAT_FADE_IN:
+		alpha -= FADE_SPEED_ALPHA;
+		if (alpha < 0) {
 
+			// フェードイン終了
+			alpha = 0.0f;
+			endFlg = true;
+			stat = E_STAT_FADE_NON;
+		}
+		break;
 	default:
 		return;
 	}
-
 }
-
+// 描画処理
 void Fader::Draw(void)
 {
-
-	switch (state_)
-	{
-	case STATE::NONE:
+	switch (stat) {
+	case E_STAT_FADE_NON:
 		return;
-	case STATE::FADE_OUT:
-	case STATE::FADE_IN:
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)alpha_);
-		DrawBox(
-			0, 0,
-			Application::SCREEN_SIZE_X,
-			Application::SCREEN_SIZE_Y,
-			0x000000, true);
+	case E_STAT_FADE_OUT:
+	case E_STAT_FADE_IN:
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)alpha);
+		DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y,
+			GetColor(0, 0, 0), true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		break;
+	default:
+		return;
 	}
+}
+// 解放処理(最後の１回のみ実行)
+bool Fader::Release(void)
+{
+	return true;
+}
 
+
+void Fader::SetFade(E_FADE_STAT_ID id) {
+
+	stat = id;
+	if (stat != E_STAT_FADE_NON) {
+		endFlg = false;
+	}
 }

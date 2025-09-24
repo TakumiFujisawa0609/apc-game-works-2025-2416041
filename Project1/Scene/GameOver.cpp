@@ -1,46 +1,50 @@
-#include "GameOver.h"
-#include "GameClear.h"
-#include "../Manager/InputManager.h"
+
 #include <DxLib.h>
-
-
-
-GameOver::GameOver(void)
+#include "GameOver.h"
+GameOverScene::GameOverScene(void)
 {
-	imgOver_, imgFramehover_, imgHomeDefault_, imgReplayDefault_ = -1;
-	homeX_, retryX_ = 0;
+	goImage = -1;
 }
-
-GameOver::~GameOver(void)
+GameOverScene::~GameOverScene(void)
 {
 }
-
-void GameOver::Init(void)
+// 初期化処理(最初の１回のみ実行)
+bool GameOverScene::SystemInit(void)
 {
-	//SoundManager& snd = SoundManager::GetInstance();
-
-	imgOver_ = LoadGraph((Application::PATH_SCENE + "Over_1.jpg").c_str());
+	goImage = LoadGraph("image/Gameover.png");
+	if (goImage == -1)return false;
+	return true;
 }
-
-void GameOver::Update(void)
+// ゲーム起動・再開時に必ず呼び出す処理
+void GameOverScene::GameInit(void)
 {
-	InputManager& ins = InputManager::GetInstance();
-	SceneManager& sce = SceneManager::GetInstance();
+	nextSceneID = E_SCENE_GAMEOVER;
+	prevNextKey = nowNextKey = 0;
 }
-
-void GameOver::Draw(void)
+// 更新処理
+void GameOverScene::Update(void)
 {
-	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0, imgOver_, true);
-
+	prevNextKey = nowNextKey;
+	nowNextKey = CheckHitKey(KEY_INPUT_SPACE);
+	// アップトリガーで判断
+	if (prevNextKey == 1 && nowNextKey == 0) {
+		nextSceneID = E_SCENE_TITLE;
+	}
 }
-
-void GameOver::Release(void)
+// 描画処理
+void GameOverScene::Draw(void)
 {
-	DeleteGraph(imgOver_);
+	int dx = (Application::SCREEN_SIZE_X - GAMEOVER_SIZE_WID) / 2;
+	int dy = (Application::SCREEN_SIZE_Y - GAMEOVER_SIZE_HIG) / 2;
+	DrawGraph(dx, dy, goImage, true);
 }
-
-
-void GameOver::SetPreviousStage(SceneManager::SCENE_ID prevStage)
+// 解放処理(最後の１回のみ実行)
+bool GameOverScene::Release(void)
 {
-	prevStage_ = prevStage;
+	if (DeleteGraph(goImage) == -1)return false;
+	return true;
+}
+// ゲッター関数
+E_SCENE_ID GameOverScene::GetNextSceneID(void) {
+	return nextSceneID;
 }

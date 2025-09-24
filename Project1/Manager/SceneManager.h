@@ -1,102 +1,40 @@
 #pragma once
 
-#include <chrono>
-
-class SceneBase;
-
-class StageBase;
-
 class Fader;
-
-class Camera;
-
-class Application; // ←もし未定義であれば追加しておく
-
+class TitleScene;
+class GameScene;
+class GameOverScene;
 class SceneManager
 {
 public:
 
-	// シーン管理用
-	enum class SCENE_ID
-	{
-		NONE,
-		TITLE,
-		SELECT,
-		STAGE01,
-		STAGE02,
-		STAGE03,
-		GAMEOVER,
-		GAMECLEAR,
-		END,
-		MAX,
+	enum E_SCENE_ID {
+		E_SCENE_NON = -1,
+		E_SCENE_TITLE,
+		E_SCENE_GAME,
+		E_SCENE_GAMEOVER,
+
+		E_SCENE_ID_MAX,
 	};
 
-	// インスタンスの生成
-	static void CreateInstance(void);
-
-	// インスタンスの取得
-	static SceneManager& GetInstance(void);
-
-	// 初期化
-	void Init(void);
-
-	// 更新
-	void Update(void);
-
-	// 描画
-	void Draw(void);
-
-	// リソースの破棄
-	void Destroy(void);
-
-	// 状態遷移
-	void ChangeScene(SCENE_ID nextId);
-
-	// シーンIDの取得
-	SCENE_ID GetSceneID(void);
-
-	// デルタタイムの取得
-	float GetDeltaTime(void) const;
-
-	// ★ 追加：前ステージIDをセット
-	void SetPrevStageID(SCENE_ID id);  // ← これが必要！
-	SCENE_ID GetPrevStageID() const { return prevStageId_; }
-
+	SceneManager(void); // コンストラクタ
+	~SceneManager(void); // デストラクタ
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 private:
+	Fader* fader; // フェードクラスのインスタンスのポインタ
+	TitleScene* titleInst; // タイトルシーンクラスのインスタンスのポインタ
+	GameScene* gameInst; // ゲームシーンクラスのインスタンスのポインタ
+	GameOverScene* gameover; // ゲームオーバーシーンクラスのインスタンスのポインタ
 
-	// 静的インスタンス
-	static SceneManager* instance_;
+	E_SCENE_ID scene_ID; // 現在のシーンID
+	E_SCENE_ID waitScene; // シーンチェンジで次に遷移するシーンのID
+	bool sceneChangeFlg; // シーンチェンジ実行中フラグ
 
-	SCENE_ID sceneId_;
-	SCENE_ID waitSceneId_;
-	SCENE_ID prevStageId_; // ★ 追加：前のステージを保持する変数
-
-	// フェード
-	Fader* fader_;
-
-	// カメラ
-	Camera* camera_;
-
-	// 各種シーン
-	SceneBase* scene_;
-
-	StageBase* stage_;
-
-	Application* application_;
-
-	// シーン遷移中判定
-	bool isSceneChanging_;
-
-	// デルタタイム
-	std::chrono::system_clock::time_point preTime_;
-	float deltaTime_;
-
-	// デフォルトコンストラクタをprivateに
-	SceneManager(void);
-	SceneManager(const SceneManager& instance) = default;
-	~SceneManager(void) = default;
-
-	void ResetDeltaTime(void);
-	void DoChangeScene(SCENE_ID sceneId);
-	void Fade(void);
+	// シーン遷移処理
+	bool ChangeScene(E_SCENE_ID id);
+	void ReleaseScene(E_SCENE_ID id);
 };

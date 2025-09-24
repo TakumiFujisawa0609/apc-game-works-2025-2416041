@@ -1,88 +1,197 @@
-#include "StageManager.h"
-#include "../Application.h"
-#include "../Manager/SceneManager.h"
-#include "../Manager/SoundManager.h"
 #include <DxLib.h>
+#include <fstream> 
+#include <string>
+#include <iostream> 
+#include <sstream>
+#include <vector>
+#include "../Application.h"
+#include "../Common/AsoUtility.h"
+#include "StageManager.h"
+
 
 StageManager::StageManager(void)
 {
-	buttonDefaultImage, buttonHoverImage = -1;
-}
 
+}
 StageManager::~StageManager(void)
 {
 }
-
-void StageManager::Init(void)
+// 初期化処理(最初の１回のみ実行)
+bool StageManager::SystemInit(void)
 {
-	stageId_ = STAGE_ID::NONE;
-
-	buttonDefaultImage = LoadGraph((Application::PATH_UI + "Default@2x_2.png").c_str());
-	buttonHoverImage = LoadGraph((Application::PATH_UI + "Hover@2x_2.png").c_str());
-
-	if (buttonDefaultImage == -1 || buttonHoverImage == -1) {
-		MessageBoxA(NULL, "ボタン画像の読み込みに失敗しました。", "エラー", MB_OK);
-	}
-
-	// 総ボタン幅 = ボタン3つ + スペース2つ
-	const int totalWidth = BUTTON_X * buttonCount + SPACE * (buttonCount - 1);
-	const int startX = (Application::SCREEN_SIZE_X - totalWidth) / 2;
-	const int y = 150; // 縦位置（中央より少し下）
-
-	for (int i = 0; i < buttonCount; ++i) {
-		int x = startX + i * (BUTTON_X + SPACE);
-		stageButtons[i] = { x, y, "STAGE" };
-	}
-
-	prevMouseInput_ = 0;
-
+	// マップチップデータを読み込む
+	int err = LoadDivGraph("image/map.bmp", MAP_CHIP_ALL_NUM,
+		MAP_CHIP_NUMS_X, MAP_CHIP_NUMS_Y,
+		MAP_CHIP_SIZE_WID, MAP_CHIP_SIZE_HIG, imgMapChipArray);
+	if (err == -1)return false;
+	return true;
 }
+// ゲーム起動・再開時に必ず呼び出す処理
+void StageManager::GameInit(void)
+{
+	LoadGroundData(); // マップデータを読み込む 
+	LoadUnderGroundData();
 
+	ChangeMap(MAP_TYPE::E_MIYPE_GROUND);
 
+	mapDispStPos.x = mapDispStPos.y = 0;
+}
+// 更新処理
 void StageManager::Update(void)
 {
-	SceneManager& sce = SceneManager::GetInstance();
-	
-
-	int currentInput = GetMouseInput();
-
-	// 左クリックを押した瞬間だけ判定
-	if ((currentInput & MOUSE_INPUT_LEFT) && !(prevMouseInput_ & MOUSE_INPUT_LEFT)) {
-
-		for (int i = 0; i < 2; ++i) {
-			if (IsMouseOver(stageButtons[i])) {
-				if (i == 0) {
-					sce.ChangeScene(SceneManager::SCENE_ID::STAGE02);
-				}
-				else if (i == 1) {
-					sce.ChangeScene(SceneManager::SCENE_ID::STAGE01);
-				}
-			}
-		}
-	}
-
-	prevMouseInput_ = currentInput;
-
 }
-
+// 描画処理
 void StageManager::Draw(void)
 {
-	
-	// デバッグ用：マウス座標表示
-	int mx, my;
-	GetMousePoint(&mx, &my);
-	//DrawFormatString(0, 0, GetColor(255, 255, 0), "Mouse: (%d, %d)", mx, my);
+	// まず背景を黒で塗りつぶす
+	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, GetColor(0, 0, 0), true);
+
+	for (int yy = 0; yy < dispMapSize.y; yy++) {
+		if (yy >= DSP_CHIP_NUM_Y)break;
+		for (int xx = 0; xx < dispMapSize.x; xx++) {
+			if (xx >= DSP_CHIP_NUM_X)break;
+			int chip = dispMapDat[mapDispStPos.y + yy][mapDispStPos.x + xx];
+			int dx = MAP_CHIP_SIZE_WID * xx;
+			int dy = MAP_CHIP_SIZE_HIG * yy;
+			DrawGraph(dx, dy, imgMapChipArray[chip], true);
+		}
+	}
+}
+// 解放処理(最後の１回のみ実行)
+bool StageManager::Release(void)
+{
+	// マップチップデータの解放
+	for (int ii = MAP_CHIP_ALL_NUM; ii > 0; ii--) {
+		if (DeleteGraph(imgMapChipArray[ii - 1]) == -1)return false;
+	}
+	return true;
+}
+// マップの上方向に移動(画面は下にスクロール)
+void StageManager::MoveMapToUpper(int mov)
+{
+	mapDispStPos.y -= mov;
+	if (mapDispStPos.y < 0)
+	{
+		mapDispStPos.y = 0;
+	}
+}
+// マップの下方向に移動(画面は上にスクロール)
+void StageManager::MoveMapToDown(int mov)
+{
+	mapDispStPos.y += mov;
+	if (mapDispStPos.y + DSP_CHIP_NUM_Y >= MAP_GROUND_NUM_Y)
+		mapDispStPos.y = MAP_GROUND_NUM_Y - DSP_CHIP_NUM_Y;
+
+}
+// マップの左方向に移動(画面は右にスクロール)
+void StageManager::MoveMapToLeft(int mov)
+{
+	mapDispStPos.x -= mov;
+	if (mapDispStPos.x < 0)mapDispStPos.x = 0;
+}
+// マップの右方向に移動(画面は左にスクロール)
+void StageManager::MoveMapToRight(int mov)
+{
+	mapDispStPos.x += mov;
+	if (mapDispStPos.x + DSP_CHIP_NUM_X < MAP_GROUND_NUM_X)
+		mapDispStPos.x = MAP_GROUND_NUM_X - DSP_CHIP_NUM_X;
 }
 
-void StageManager::Release(void)
+// 外部ファイルからマップデータを読み込む処理
+bool StageManager::LoadGroundData(void)
 {
-	
+	// マップデータ読み込みバッファを初期化
+//	for (int yy = 0; yy < MAP_GROUND_NUM_Y; yy++) {
+//		for (int xx = 0; xx < MAP_GROUND_NUM_X; xx++) {
+//			groundMapDat[yy][xx] = -1;
+//		}
+//	}
+	memset((int*)&groundMapDat[0], -1, sizeof(int) * (MAP_GROUND_NUM_X * MAP_GROUND_NUM_Y));
+
+	std::ifstream ifs = std::ifstream("data/Ground2.csv");
+	if (!ifs)return false;
+
+	// ファイルを1行ずつ読み込む
+	std::string line; // 1行の文字情報
+	std::vector<std::string> strSplit;// 1文字情報
+	int chipNo = 0;
+	int yy = 0;
+	while (getline(ifs, line)) {
+		// 1行の情報 string を ifstream の仲間に変換する
+		strSplit = AsoUtility::Split(line, ',');
+		for (int xx = 0; xx < strSplit.size(); xx++) {
+			// string から int に変換する
+			chipNo = stoi(strSplit[xx]);
+			// 地上マップデータ(2次元配列)にマップチップ番号を格納する
+			groundMapDat[yy][xx] = chipNo;
+		}
+		yy++;
+	}
+	return true;
+}
+bool StageManager::LoadUnderGroundData(void)
+{
+	memset((int*)&underGroundMapDat[0], -1, sizeof(int) * (MAP_UNGROUND_NUM_X * MAP_UNGROUND_NUM_Y));
+	std::ifstream ifs = std::ifstream("data/UnGround.csv");
+	if (!ifs)return false;
+
+	// ファイルを1行ずつ読み込む
+	std::string line; // 1行の文字情報
+	std::vector<std::string> strSplit;// 1文字情報
+	int chipNo = 0;
+	int yy = 0;
+	while (getline(ifs, line)) {
+		// 1行の情報 string を ifstream の仲間に変換する
+		strSplit = AsoUtility::Split(line, ',');
+		for (int xx = 0; xx < strSplit.size(); xx++) {
+			// string から int に変換する
+			chipNo = stoi(strSplit[xx]);
+			// 地上マップデータ(2次元配列)にマップチップ番号を格納する
+			underGroundMapDat[yy][xx] = chipNo;
+		}
+		yy++;
+	}
+	return true;
 }
 
-bool StageManager::IsMouseOver(const Button& btn)
+
+int StageManager::GetMapChipNo(Vector2 mPos) { return dispMapDat[mPos.y][mPos.x]; }
+
+void StageManager::ChangeMap(MAP_TYPE mtype)
 {
-	int mx, my;
-	GetMousePoint(&mx, &my);
-	return (mx >= btn.x && mx <= btn.x + SELECT_STAGE_X &&
-		my >= btn.y && my <= btn.y + SELECT_STAGE_Y);
+	ClearDispMap();
+
+	mapType = mtype;
+
+	switch (mapType) {
+	case MAP_TYPE::E_MIYPE_GROUND:
+		dispMapSize.x = MAP_GROUND_NUM_X;
+		dispMapSize.y = MAP_GROUND_NUM_Y;
+
+		for (int yy = 0; yy < dispMapSize.y; yy++) {
+			for (int xx = 0; xx < dispMapSize.x; xx++) {
+				dispMapDat[yy][xx] = groundMapDat[yy][xx];
+			}
+		}
+
+		break;
+	case MAP_TYPE::E_MIYPE_UNDER_GROUND:
+		dispMapSize.x = MAP_UNGROUND_NUM_X;
+		dispMapSize.y = MAP_UNGROUND_NUM_Y;
+
+		for (int yy = 0; yy < dispMapSize.y; yy++) {
+			for (int xx = 0; xx < dispMapSize.x; xx++) {
+				dispMapDat[yy][xx] = underGroundMapDat[yy][xx];
+			}
+		}
+		break;
+	}
+}
+void StageManager::ClearDispMap(void)
+{
+	for (int yy = 0; yy < MAP_MAX_NUM_Y; yy++) {
+		for (int xx = 0; xx < MAP_MAX_NUM_X; xx++) {
+			dispMapDat[yy][xx] = -1;
+		}
+	}
 }

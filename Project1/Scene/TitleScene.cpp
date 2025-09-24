@@ -1,45 +1,54 @@
 #include <DxLib.h>
 #include "TitleScene.h"
 #include "../Application.h"
-#include "../Manager/SceneManager.h"
-#include "../Manager/InputManager.h"
-
 TitleScene::TitleScene(void)
 {
-	imgTitle_ = -1;
+	bgImage = -1;
 }
-
 TitleScene::~TitleScene(void)
 {
-	imgTitle_ = LoadGraph((Application::PATH_SCENE + "Title_1.png").c_str());
+
 }
 
-void TitleScene::Init(void)
+bool TitleScene::SystemInit(void)
 {
-	SceneManager& sce = SceneManager::GetInstance();
-	InputManager& ins = InputManager::GetInstance();
-	// シーン遷移
-	if (ins.IsTrgMouseLeft())
-	{
-		SceneManager::GetInstance().ChangeScene(
-			SceneManager::SCENE_ID::SELECT);
+	//SetTransColor(0xff, 0x00, 0xff);
+
+	bgImage = LoadGraph("image/title.bmp");
+	if (bgImage == -1) {
+		return false;
 	}
+	return true;
+}
+void TitleScene::GameInit(void)
+{
+	nextSceneID = E_SCENE_TITLE;
 
-	// -------------------------
-	// ゲームオーバー・クリア処理
-	// -------------------------
-	if (ins.IsTrgDown(KEY_INPUT_SPACE)) { sce.ChangeScene(SceneManager::SCENE_ID::GAMEOVER); }
-
+	prevSpaceKey = nowSpaceKey = 0;
 }
 
 void TitleScene::Update(void)
 {
+	prevSpaceKey = nowSpaceKey;
+	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+
+	if (prevSpaceKey == 1 && nowSpaceKey == 0) {
+		nextSceneID = E_SCENE_GAME;
+	}
 }
 
 void TitleScene::Draw(void)
 {
+	int dx = (Application::SCREEN_SIZE_X - TITLE_SIZE_WID) / 2;
+	int dy = (Application::SCREEN_SIZE_Y - TITLE_SIZE_HIG) / 2;
+	DrawGraph(dx, dy, bgImage, true);
 }
 
-void TitleScene::Release(void)
+bool TitleScene::Release(void)
 {
+	if (DeleteGraph(bgImage) == -1)return false;
+
+	return true;
 }
+
+E_SCENE_ID TitleScene::GetNextSceneID(void) { return nextSceneID; }

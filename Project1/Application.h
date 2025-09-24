@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
+class SceneManager;
+
 class Application
 {
 public:
 
 	// スクリーンサイズ
-	static constexpr int SCREEN_SIZE_X = 1024;
-	static constexpr int SCREEN_SIZE_Y = 640;
+	static constexpr int SCREEN_SIZE_X = 800; // ゲーム画面の横サイズ
+	static constexpr int SCREEN_SIZE_Y = 600; // ゲーム画面の縦サイズ
 
 	static constexpr float FRAME_RATE = 1000.0f / 60.0f;
 
@@ -32,54 +34,16 @@ public:
 	//static const std::string PATH_MAP_DATA;
 	//------------------------------------------
 
-	// インスタンスを明示的に生成
-	static void CreateInstance(void);
-
-	// インスタンスの取得
-	static Application& GetInstance(void);
-
-	// 初期化
-	void Init(void);
-
-	// ゲームループの開始
-	void Run(void);
-
-	// リソースの破棄
-	void Destroy(void);
-
-	// 初期化成功／失敗の判定
-	bool IsInitFail(void) const;
-
-	// 解放成功／失敗の判定
-	bool IsReleaseFail(void) const;
-
-	void CalcFrameRate(void);					// フレームレート計算
-	void DrawFrameRate();
-
-	void DrawPauseOverlay(void);
+	Application(void); // コンストラクタ
+	~Application(void); // デストラクタ
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void Run(void); // ゲーム起動
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 
 private:
 
-	bool isPauseMenuActive_ = false; // ポーズメニュー中かどうか
-	bool prevEscapePressed_ = false; // 前フレームのESC入力
-
-	// 静的インスタンス
-	static Application* instance_;
-
-	// 初期化失敗
-	bool isInitFail_;
-
-	// 解放失敗
-	bool isReleaseFail_;
-
-	// デフォルトコンストラクタをprivateにして、
-	// 外部から生成できない様にする
-	Application(void);
-
-	// コピーコンストラクタも同様
-	Application(const Application& instance) = default;
-
-	// デストラクタも同様
-	~Application(void) = default;
+	SceneManager* sceneMana; // シーンマネージャーのインスタンスのポインタ
 };
 

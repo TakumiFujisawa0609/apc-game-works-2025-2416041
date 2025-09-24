@@ -1,7 +1,7 @@
 #include "Application.h"
 #include <DxLib.h>
-
-Application* Application::instance_ = nullptr;
+#include <time.h>
+#include "Manager/SceneManager.h"
 
 const std::string Application::PATH_DATA = "Data/";
 const std::string Application::PATH_OBJECT = PATH_DATA + "object/";
@@ -14,171 +14,74 @@ const std::string Application::PATH_MOVIE = PATH_DATA + "Movie/"; // “®‰æ‚ÌƒpƒX
 //const std::string Application::PATH_EFFECT = PATH_DATA + "Effect/";
 //const std::string Application::PATH_MAP_DATA = PATH_DATA + "MapData/MapData.csv";
 
-void Application::CreateInstance(void)
-{
-	if (instance_ == nullptr)
-	{
-		instance_ = new Application();
-	}
-	instance_->Init();
-}
-
-Application& Application::GetInstance(void)
-{
-	return *instance_;
-}
-
-void Application::Init(void)
-{
-
-	// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ì‰ŠúÝ’è
-	SetWindowText("Slot Survivor");
-
-	// ƒEƒBƒ“ƒhƒEƒTƒCƒY
-	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
-	ChangeWindowMode(true);
-
-	// DxLib‚Ì‰Šú‰»
-	isInitFail_ = false;
-	if (DxLib_Init() == -1)
-	{
-		isInitFail_ = true;
-		return;
-	}
-
-	// —”‚ÌƒV[ƒh’l‚ðÝ’è‚·‚é
-	DATEDATA date;
-
-	// Œ»ÝŽž‚ðŽæ“¾‚·‚é
-	GetDateTime(&date);
-
-	// —”‚Ì‰Šú’l‚ðÝ’è‚·‚é
-	// Ý’è‚·‚é”’l‚É‚æ‚Á‚ÄAƒ‰ƒ“ƒ_ƒ€‚Ìo•û‚ª•Ï‚í‚é
-	SRand(date.Year + date.Mon + date.Day + date.Hour + date.Min + date.Sec);
-
-	
-
-	// “ü—Í§Œä‰Šú‰»
-	SetUseDirectInputFlag(true);
-	
-
-	// ƒV[ƒ“ŠÇ—‰Šú‰»
-	//SceneManager::CreateInstance();
-
-}
-
-void Application::Run(void)
-{
-	//InputManager& inputManager = InputManager::GetInstance();
-	//SceneManager& sceneManager = SceneManager::GetInstance();
-
-	while (ProcessMessage() == 0)
-	{
-		Sleep(1);
-
-		currentTime = GetNowCount();
-
-		if (currentTime - lastFrameTime >= FRAME_RATE) {
-			lastFrameTime = currentTime;
-			frameCnt++;
-		}
-
-		//inputManager.Update();
-
-		// Escape ƒL[“ü—Íˆ—
-		bool nowEscapePressed = CheckHitKey(KEY_INPUT_ESCAPE) != 0;
-
-		// ˆê“x‰Ÿ‚³‚ê‚½uŠÔ‚¾‚¯”½‰ž
-		if (nowEscapePressed && !prevEscapePressed_) {
-			isPauseMenuActive_ = !isPauseMenuActive_;
-		}
-		prevEscapePressed_ = nowEscapePressed;
-
-		// ƒ|[ƒY’†‚ÍXV’âŽ~
-		if (!isPauseMenuActive_) {
-			//sceneManager.Update();
-		}
-
-		// í‚É•`‰æˆ—‚Ís‚¤iƒ|[ƒY’†‚Å‚à”wŒi•`‚­‚½‚ßj
-		//sceneManager.Draw();
-
-		// ƒ|[ƒYƒI[ƒo[ƒŒƒC•`‰æ
-		if (isPauseMenuActive_) {
-			DrawPauseOverlay(); // ©‰º‚Å’è‹`
-		}
-
-		CalcFrameRate();
-
-		ScreenFlip();
-	}
-}
-
-void Application::DrawPauseOverlay()
-{
-	// ”wŒiiÔ‚¢”¼“§–¾j
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-	DrawBox(0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, GetColor(255, 0, 0), TRUE);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	// ƒ}ƒEƒXÀ•W
-	int mouseX, mouseY;
-	GetMousePoint(&mouseX, &mouseY);
-
-	
-}
-
-void Application::Destroy(void)
-{
-
-	// DxLibI—¹
-	if (DxLib_End() == -1)
-	{
-		isReleaseFail_ = true;
-	}
-
-	// ƒV[ƒ“ŠÇ—‰ð•ú
-	//SceneManager::GetInstance().Destroy();
-
-	// “ü—Í§Œä‰ð•ú
-	//InputManager::GetInstance().Destroy();
-
-	// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìƒƒ‚ƒŠ‰ð•ú
-	delete instance_;
-
-}
-
-bool Application::IsInitFail(void) const
-{
-	return isInitFail_;
-}
-
-bool Application::IsReleaseFail(void) const
-{
-	return isReleaseFail_;
-}
-
+//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 Application::Application(void)
 {
-	isInitFail_ = false;
-	isReleaseFail_ = false;
+	sceneMana = nullptr;
 }
 
-void Application::CalcFrameRate(void)
+//ƒfƒXƒgƒ‰ƒNƒ^
+Application::~Application(void)
 {
-	int nDifTime = currentTime - updateFrameRateTime;
 
-	if (nDifTime > 1000) {
-		float fFrameCnt = (float)(frameCnt * 1000);
+}
 
-		frameRate = fFrameCnt / nDifTime;
+//‰Šú‰»ˆ—iÅ‰‚Ìˆê‰ñ‚Ì‚ÝŽÀsj
+bool Application::SystemInit(void)
+{
+	//ƒVƒXƒeƒ€ˆ—
+	SetWindowText("2416041 ŽçŒû‘¾ˆê˜N");
+	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
+	//ƒQ[ƒ€ƒEƒCƒ“ƒhƒE‚ÌƒTƒCƒY‚ÆFƒ‚[ƒh‚ðÝ’è
+	ChangeWindowMode(true);
 
-		frameCnt = 0;
+	if (DxLib_Init() == -1) return false;
 
-		updateFrameRateTime = currentTime;
+	// —”‚Ì‰Šú‰»
+	SRand((unsigned int)time(NULL));
+
+	// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
+	sceneMana = new SceneManager();
+	if (sceneMana == nullptr)return false;
+
+	sceneMana->SystemInit();
+
+	return true;
+}
+
+// ƒQ[ƒ€‹N“®
+void Application::Run(void)
+{
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0) {
+		Update(); // XV
+		Draw(); // •`‰æ
 	}
 }
 
-void Application::DrawFrameRate()
+// XV
+void Application::Update(void)
 {
-	DrawFormatString(Application::SCREEN_SIZE_X - 90, 0, GetColor(255, 30, 30), "FPS[%.2f]", frameRate);
+	sceneMana->Update();
+}
+// •`‰æ
+void Application::Draw(void)
+{
+	SetDrawScreen(DX_SCREEN_BACK); // •`‰æ‚·‚é‰æ–Ê‚ð— ‚Ì‰æ–Ê‚ÉÝ’è‚·‚é
+	ClearDrawScreen(); // •`‰æ‚·‚é‰æ–Ê‚Ì“à—e‚ðÁ‹Ž(ƒNƒŠƒA)‚·‚é
+
+	sceneMana->Draw();
+
+	ScreenFlip(); // — ‰æ–Ê‚Æ•\‰æ–Ê‚ð“ü‚ê‘Ö‚¦‚é
+}
+
+// ‰ð•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚ÝŽÀs)
+bool Application::Release(void)
+{
+	sceneMana->Release();
+
+	delete sceneMana;
+	sceneMana = nullptr;
+
+	if (DxLib_End() == -1)return false;
+	return true;
 }

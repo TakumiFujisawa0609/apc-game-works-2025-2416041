@@ -14,7 +14,7 @@ public:
 	static const int BUTTON_WIDTH = 96;
 	static const int BUTTON_HEIGHT = 96;
 	static const int BUTTON_SPACING = 50;
-	static const int CLEAR_BUTTON_Y = Application::SCREEN_SIZE_Y * 3 / 5;
+	static const int CLEAR_BUTTON_Y = Application::SCREEN_SIZE_X * 3 / 5;
 
 	GameClear(void);
 	~GameClear(void);

@@ -1,198 +1,161 @@
-#include "SceneManager.h"
-#include "../Scene/TitleScene.h"
-#include "../Manager/StageManager.h"
-#include "../Scene/GameClear.h"
-#include "../Scene/GameOver.h"
-#include "../Manager/SoundManager.h"
-#include "../Common/Fader.h"
 #include <DxLib.h>
-#include "../Scene/Stage/Stage_1.h"
-
-SceneManager* SceneManager::instance_ = nullptr;
-
-void SceneManager::CreateInstance()
-{
-	if (instance_ == nullptr)
-	{
-		instance_ = new SceneManager();
-	}
-	instance_->Init();
-}
-
-SceneManager& SceneManager::GetInstance(void)
-{
-	return *instance_;
-}
-
-void SceneManager::Init(void)
-{
-	sceneId_ = SCENE_ID::TITLE;
-	waitSceneId_ = SCENE_ID::NONE;
-	prevStageId_ = SCENE_ID::NONE;
-
-	fader_ = new Fader();
-	fader_->Init();
-
-	isSceneChanging_ = false;
-
-	preTime_ = std::chrono::system_clock::now();
-
-	DoChangeScene(SCENE_ID::TITLE);
-
-
-}
-
-void SceneManager::Update(void)
-{
-	if (scene_ == nullptr)
-	{
-		return;
-	}
-
-	auto nowTime = std::chrono::system_clock::now();
-	deltaTime_ = static_cast<float>(
-		std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - preTime_).count() / 1000000000.0);
-	preTime_ = nowTime;
-
-	fader_->Update();
-
-	if (isSceneChanging_)
-	{
-		Fade();
-	}
-	else
-	{
-		//scene_->Update();
-	}
-}
-
-void SceneManager::Draw(void)
-{
-	SetDrawScreen(DX_SCREEN_BACK);
-	ClearDrawScreen();
-
-	//scene_->Draw();
-	fader_->Draw();
-}
-
-void SceneManager::Destroy(void)
-{
-	if (scene_)
-	{
-		//scene_->Release();
-		delete scene_;
-	}
-
-	delete fader_;
-	delete instance_;
-}
-
-void SceneManager::ChangeScene(SCENE_ID nextId)
-{
-	waitSceneId_ = nextId;
-	fader_->SetFade(Fader::STATE::FADE_OUT);
-	isSceneChanging_ = true;
-}
-
-SceneManager::SCENE_ID SceneManager::GetSceneID(void)
-{
-	return sceneId_;
-}
-
-float SceneManager::GetDeltaTime(void) const
-{
-	return deltaTime_;
-}
-
+#include "SceneManager.h"
+#include "../Common/Fader.h"
+#include "../Scene/TitleScene.h"
+#include "../Scene/SceneBase.h"
+#include "../Scene/GameOver.h"
 SceneManager::SceneManager(void)
 {
-	sceneId_ = SCENE_ID::NONE;
-	waitSceneId_ = SCENE_ID::NONE;
-	prevStageId_ = SCENE_ID::NONE;
-
-	scene_ = nullptr;
-	fader_ = nullptr;
-
-	isSceneChanging_ = false;
-	deltaTime_ = 1.0f / 60.0f;
+	fader = nullptr;
+	titleInst = nullptr;
+	gameInst = nullptr;
+	gameover = nullptr;
+	scene_ID = waitScene = E_SCENE_NON;
 }
-
-void SceneManager::ResetDeltaTime(void)
+SceneManager::~SceneManager(void)
 {
-	deltaTime_ = 0.016f;
-	preTime_ = std::chrono::system_clock::now();
 }
-
-void SceneManager::DoChangeScene(SCENE_ID sceneId)
+// 初期化処理(最初の１回のみ実行)
+bool SceneManager::SystemInit(void)
 {
-	sceneId_ = sceneId;
-
-	if (scene_ != nullptr)
-	{
-		//scene_->Release();
-		delete scene_;
-	}
-
-	switch (sceneId_)
-	{
-	//case SCENE_ID::TITLE:
-		//scene_ = new TitleScene();
-	//	break;
-	//case SCENE_ID::SELECT:
-		//scene_ = new StageManager();
-	//	break;
-	case SCENE_ID::STAGE01:
-		scene_ = new Stage_1();
-		break;
-	case SCENE_ID::STAGE02:
-		//scene_ = new Stage_2();
-		break;
-	case SCENE_ID::GAMECLEAR:
-		//scene_ = new GameClear();
-		break;
-	case SCENE_ID::GAMEOVER:
-	{
-		auto* overScene = new GameOver();
-		//overScene->SetPreviousStage(prevStageId_);  // ← ここで記録された前ステージを渡す
-		//scene_ = overScene;
-		break;
-	}
-	case SCENE_ID::END:
-		///application_->Destroy();
-		break;
-	case SCENE_ID::MAX:
-		// 未使用
-		break;
-	}
-
-	//scene_->Init();
-	ResetDeltaTime();
-	waitSceneId_ = SCENE_ID::NONE;
+	// インスタンスの生成
+	fader = new Fader();
+	if (fader == nullptr)return false;
+	SetTransColor(0xff, 0x00, 0xff); // 透過色の設定
+	fader->SystemInit();
+	sceneChangeFlg = false;
+	ChangeScene(E_SCENE_TITLE);
+	return true;
 }
-
-void SceneManager::Fade(void)
+// ゲーム起動・再開時に必ず呼び出す処理
+void SceneManager::GameInit(void)
 {
-	Fader::STATE fState = fader_->GetState();
-	switch (fState)
-	{
-	case Fader::STATE::FADE_IN:
-		if (fader_->IsEnd())
-		{
-			fader_->SetFade(Fader::STATE::NONE);
-			isSceneChanging_ = false;
+}
+// 更新処理
+void SceneManager::Update(void)
+{
+	fader->Update();
+	if (sceneChangeFlg) {
+		// シーンチェンジ実行中
+		if (fader->IsEnd() && waitScene != E_SCENE_NON) {
+			ChangeScene(waitScene);
+			waitScene = E_SCENE_NON;
+			fader->SetFade(E_STAT_FADE_IN);
+		}
+		else if (fader->IsEnd() && waitScene == E_SCENE_NON) {
+			sceneChangeFlg = false;
+		}
+	}
+	else {
+		E_SCENE_ID nextSceneID = scene_ID;
+		switch (scene_ID) {
+		case E_SCENE_TITLE:
+			titleInst->Update();
+			nextSceneID = titleInst->GetNextSceneID();
+			break;
+		case E_SCENE_GAME:
+			gameInst->Update();
+			nextSceneID = gameInst->GetNextSceneID();
+			break;
+		case E_SCENE_GAMEOVER:
+			gameover->Update();
+			nextSceneID = gameover->GetNextSceneID();
+			break;
+		}
+		// シーン遷移判定
+		if (scene_ID != nextSceneID) {
+			sceneChangeFlg = true;
+			waitScene = nextSceneID;
+			fader->SetFade(E_STAT_FADE_OUT);
+		}
+	}
+}
+// 描画処理
+void SceneManager::Draw(void)
+{
+	switch (scene_ID) {
+	case E_SCENE_TITLE:
+		titleInst->Draw();
+		break;
+	case E_SCENE_GAME:
+		gameInst->Draw();
+		break;
+	case E_SCENE_GAMEOVER:
+		gameover->Draw();
+		break;
+	}
+	fader->Draw();
+}
+// 解放処理(最後の１回のみ実行)
+bool SceneManager::Release(void)
+{
+	ReleaseScene(E_SCENE_TITLE);
+	ReleaseScene(E_SCENE_GAME);
+	ReleaseScene(E_SCENE_GAMEOVER);
+
+	fader->Release();
+
+	delete fader;
+	fader = nullptr;
+	return true;
+}
+bool SceneManager::ChangeScene(E_SCENE_ID id)
+{
+	// 現在のシーンを解放
+	ReleaseScene(scene_ID);
+	// シーンIDを変更
+	scene_ID = id;
+	switch (scene_ID) {
+	case E_SCENE_TITLE:
+		if (titleInst == nullptr) {
+			titleInst = new TitleScene();
+			if (titleInst == nullptr)return false;
+			if (titleInst->SystemInit() == false)return false;
+			titleInst->GameInit();
 		}
 		break;
-	case Fader::STATE::FADE_OUT:
-		if (fader_->IsEnd())
-		{
-			DoChangeScene(waitSceneId_);
-			fader_->SetFade(Fader::STATE::FADE_IN);
+	case E_SCENE_GAME:
+		if (gameInst == nullptr) {
+			gameInst = new GameScene();
+			if (gameInst == nullptr)return false;
+			gameInst->SystemInit();
+			gameInst->GameInit();
+		}
+		break;
+	case E_SCENE_GAMEOVER:
+		if (gameover == nullptr) {
+			gameover = new GameOverScene();
+			if (gameover == nullptr)return false;
+			gameover->SystemInit();
+			gameover->GameInit();
 		}
 		break;
 	}
+	return true;
 }
-
-void SceneManager::SetPrevStageID(SCENE_ID id)
+void SceneManager::ReleaseScene(E_SCENE_ID id)
 {
-	prevStageId_ = id;
+	switch (id) {
+	case E_SCENE_TITLE:
+		if (titleInst != nullptr) {
+			titleInst->Release();
+			delete titleInst;
+			titleInst = nullptr;
+		}
+		break;
+	case E_SCENE_GAME:
+		if (gameInst != nullptr) {
+			gameInst->Release();
+			delete gameInst;
+			gameInst = nullptr;
+		}
+		break;
+	case E_SCENE_GAMEOVER:
+		if (gameover != nullptr) {
+			gameover->Release();
+			delete gameover;
+			gameover = nullptr;
+		}
+		break;
+	}
 }

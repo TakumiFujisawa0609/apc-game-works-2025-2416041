@@ -1,47 +1,23 @@
 
 #pragma once
-
-#include "SceneBase.h"
 #include "../Application.h"
-#include "../Manager/SceneManager.h"
-#include "../Manager/SoundManager.h"
-
-class SceneManager;
-
-class GameOver : public SceneBase
+#include "../StDefineData.h"
+class GameOverScene
 {
-
 public:
-
-	static const int OVER_BUTTON_Y = Application::SCREEN_SIZE_Y * 5 / 7;
-
-	// コンストラクタ
-	GameOver(void);
-
-	// デストラクタ
-	~GameOver(void);
-
-	void Init(void) override;
-	void Update(void) override;
-	void Draw(void) override;
-	void Release(void) override;
-
-	void SetPreviousStage(SceneManager::SCENE_ID prevStage);
-
+	static constexpr int GAMEOVER_SIZE_WID = 457; // ゲームオーバー画像の横サイズ
+	static constexpr int GAMEOVER_SIZE_HIG = 81; // ゲームオーバー画像の縦サイズ
+	GameOverScene(void);
+	~GameOverScene(void);
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
+	E_SCENE_ID GetNextSceneID(void); // 次に遷移するシーンのIDを取得する
 private:
-
-	// ボタンの位置（Initで設定）
-	int homeX_;
-	int nextX_;
-	int retryX_;
-
-	// 画像
-	int imgOver_;
-	int imgFramehover_;
-	int imgHomeDefault_;
-	int imgNextDefault_;
-	int imgReplayDefault_;
-
-	SceneManager::SCENE_ID prevStage_;
+	int goImage; // ゲームオーバー画像のハンドル番号
+	E_SCENE_ID nextSceneID; // 次に遷移するシーンのID
+	int prevNextKey, nowNextKey;
 };
 

@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Common\AsoUtility.cpp" />
     <ClCompile Include="Common\Fader.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="Object\Player.cpp" />
@@ -147,9 +148,11 @@
     <ClCompile Include="Common\Vector2.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="Scene\Stage\Stage_1.cpp" />
+    <ClCompile Include="Common\Vector2F.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Common\AsoUtility.h" />
     <ClInclude Include="Common\Collision.h" />
     <ClInclude Include="Common\Fader.h" />
     <ClInclude Include="Object\Enemy.h" />
@@ -164,6 +167,8 @@
     <ClInclude Include="Common\Vector2.h" />
     <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="Scene\Stage\Stage_1.h" />
+    <ClInclude Include="StDefineData.h" />
+    <ClInclude Include="Common\Vector2F.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Data\object\player.png" />
