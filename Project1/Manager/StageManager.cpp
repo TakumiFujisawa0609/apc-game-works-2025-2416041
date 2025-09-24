@@ -67,19 +67,7 @@ void StageManager::Update(void)
 
 void StageManager::Draw(void)
 {
-	// 各ボタンを描画
-	for (int i = 0; i < 2; ++i) {
-		const Button& btn = stageButtons[i];
-
-		int img = IsMouseOver(btn) ? buttonHoverImage : buttonDefaultImage;
-
-		int centerX = btn.x + SELECT_STAGE_X / 2;
-		int centerY = btn.y + SELECT_STAGE_Y / 2;
-
-		DrawRotaGraph(centerX, centerY, 1.0, 0.0, img, true);
-		DrawString(centerX - 30, centerY + 90, btn.label, GetColor(255, 255, 255));
-	}
-
+	
 	// デバッグ用：マウス座標表示
 	int mx, my;
 	GetMousePoint(&mx, &my);

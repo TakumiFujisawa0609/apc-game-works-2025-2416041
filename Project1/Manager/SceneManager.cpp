@@ -6,6 +6,7 @@
 #include "../Manager/SoundManager.h"
 #include "../Common/Fader.h"
 #include <DxLib.h>
+#include "../Scene/Stage/Stage_1.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -134,14 +135,14 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 
 	switch (sceneId_)
 	{
-	case SCENE_ID::TITLE:
-		scene_ = new TitleScene();
-		break;
-	case SCENE_ID::SELECT:
+	//case SCENE_ID::TITLE:
+		//scene_ = new TitleScene();
+	//	break;
+	//case SCENE_ID::SELECT:
 		//scene_ = new StageManager();
-		break;
+	//	break;
 	case SCENE_ID::STAGE01:
-		//scene_ = new Stage_1();
+		scene_ = new Stage_1();
 		break;
 	case SCENE_ID::STAGE02:
 		//scene_ = new Stage_2();

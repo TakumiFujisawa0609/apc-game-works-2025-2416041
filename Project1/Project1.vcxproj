@@ -146,6 +146,7 @@
     <ClCompile Include="Manager\StageManager.cpp" />
     <ClCompile Include="Common\Vector2.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="Scene\Stage\Stage_1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Common\Vector2.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="Scene\Stage\Stage_1.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Data\object\player.png" />

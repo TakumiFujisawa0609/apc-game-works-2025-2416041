@@ -2,7 +2,6 @@
 #include "TitleScene.h"
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
-#include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
 
 TitleScene::TitleScene(void)
