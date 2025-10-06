@@ -6,7 +6,7 @@
 
 class SceneManager;
 
-class GameClear : public SceneBase
+class GameClear : public SceneManager
 {
 public:
 
@@ -14,15 +14,15 @@ public:
 	static const int BUTTON_WIDTH = 96;
 	static const int BUTTON_HEIGHT = 96;
 	static const int BUTTON_SPACING = 50;
-	static const int CLEAR_BUTTON_Y = Application::SCREEN_SIZE_X * 3 / 5;
+	static const int CLEAR_BUTTON_Y = Application::SCREEN_SIZE_WID * 3 / 5;
 
 	GameClear(void);
 	~GameClear(void);
 
-	void Init(void) override;
-	void Update(void) override;
-	void Draw(void) override;
-	void Release(void) override;
+	void Init(void);
+	void Update(void);
+	void Draw(void) ;
+	void Release(void);
 
 private:
 

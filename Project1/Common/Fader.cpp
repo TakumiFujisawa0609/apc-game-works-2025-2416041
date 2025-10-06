@@ -60,7 +60,7 @@ void Fader::Draw(void)
 	case E_STAT_FADE_OUT:
 	case E_STAT_FADE_IN:
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)alpha);
-		DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y,
+		DrawBox(0, 0, Application::SCREEN_SIZE_WID, Application::SCREEN_SIZE_HIG,
 			GetColor(0, 0, 0), true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		break;

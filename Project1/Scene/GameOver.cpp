@@ -34,8 +34,8 @@ void GameOverScene::Update(void)
 // ï`âÊèàóù
 void GameOverScene::Draw(void)
 {
-	int dx = (Application::SCREEN_SIZE_X - GAMEOVER_SIZE_WID) / 2;
-	int dy = (Application::SCREEN_SIZE_Y - GAMEOVER_SIZE_HIG) / 2;
+	int dx = (Application::SCREEN_SIZE_WID - GAMEOVER_SIZE_WID) / 2;
+	int dy = (Application::SCREEN_SIZE_HIG - GAMEOVER_SIZE_HIG) / 2;
 	DrawGraph(dx, dy, goImage, true);
 }
 // âï˙èàóù(ç≈å„ÇÃÇPâÒÇÃÇ›é¿çs)

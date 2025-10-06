@@ -1,5 +1,4 @@
-#pragma once
-
+#include "../StDefineData.h"
 class Fader;
 class TitleScene;
 class GameScene;
@@ -7,16 +6,6 @@ class GameOverScene;
 class SceneManager
 {
 public:
-
-	enum E_SCENE_ID {
-		E_SCENE_NON = -1,
-		E_SCENE_TITLE,
-		E_SCENE_GAME,
-		E_SCENE_GAMEOVER,
-
-		E_SCENE_ID_MAX,
-	};
-
 	SceneManager(void); // コンストラクタ
 	~SceneManager(void); // デストラクタ
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)

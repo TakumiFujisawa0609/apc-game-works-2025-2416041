@@ -1,29 +1,62 @@
 #pragma once
 
-#include "../Manager/SoundManager.h"
+#include <vector>
+#include<list>
+#include "../Common/Vector2.h"
+#include "../StDefineData.h"
 
-class SceneBase
+class StageBase;
+class Player;
+class EnemyBase;
+class Bullet;
+
+class GameScene
 {
 
 public:
+	//スクロールを発生させる範囲
+	static constexpr int SCROLL_AREA_WID = 150;
+	static constexpr int SCROLL_AREA_HIG = 100;
 
-	// コンストラクタ
-	SceneBase(void);
+	//エンカウント(値が大きいと出現する間隔が長くなる）
+	static constexpr int ENCOUNT = 180;
 
-	// デストラクタ
-	virtual ~SceneBase(void) = 0;
+	GameScene(void);
+	~GameScene(void);
 
-	// 初期化処理
-	virtual void Init(void) = 0;
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
 
-	// 更新ステップ
-	virtual void Update(void) = 0;
+	StageBase* GetLpStage(void) { return stage; }
+	Player* GetLpPlayer(void) { return player; }
 
-	// 描画処理
-	virtual void Draw(void) = 0;
+	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
-	// 解放処理
-	virtual void Release(void) = 0;
+private:
+	StageBase* stage; // Stageクラスのインスタンスのポインタ
+	Player* player; // Playerクラスのインスタンスのポインタ
+	Bullet* bullet; // Bulletクラスのインスタンスのポインタ
+	// EnemyBaseクラスのインスタンスのポインタの可変長テーブル
 
+	// 複数の敵を動的に管理する
+	std::vector<EnemyBase*> enemys;
+	// 敵の足元のY座標の小さい順にソートする為の可変長テーブル
+	std::list<EnemyBase*> enemysSortTbl;
+	// 敵の発生頻度用のカウンター
+	int enCounter;
+
+	int prevShotKey, nowShotKey; // キーの入力状態
+
+	E_SCENE_ID nextSceneID; // 次に遷移するシーンのID
+	void MapScrollProc(void);
+	void EraseEnemys(void); // 敵データテーブルを空にする
+	Vector2 WorldPos2MapPos(Vector2 wpos); // ワールド座標をマップ座標に変換する
+	bool IsCollisionStage(Vector2 worldPos); // ワールド座標の指す地形は衝突対象か
+	void CollisionCheck(void);
+	bool CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vector2 centerPos2, Vector2 size2);
 };
+
 

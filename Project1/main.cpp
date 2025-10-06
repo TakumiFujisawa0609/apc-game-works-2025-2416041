@@ -1,37 +1,17 @@
 #include <DxLib.h>
-//#include "Application.h"
+#include "Application.h"
 
 // WinMain関数
 //---------------------------------
-int WINAPI WinMain(
-	_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-
-	// インスタンスの生成
-	//Application::CreateInstance();
-
-	// インスタンスの取得
-	//Application& instance = Application::GetInstance();
-
-	//if (instance.IsInitFail())
-	//{
-		// 初期化失敗
-		//return -1;
-	//}
-
-	// 実行
-	//instance.Run();
-
-	// 解放
-	//instance.Destroy();
-
-	//if (instance.IsReleaseFail())
-	//{
-		// 解放失敗
-		//return -1;
-	//}
-
-	return 0;
-
+	// アプリケーションクラスのインスタンスの作成
+	Application application;
+	// 初期化処理
+	if (application.SystemInit() == false)return -1;
+	// ゲーム起動
+	application.Run();
+	// 解放処理
+	if (application.Release() == false)return -1;
+	return 0; // ゲームの終了
 }

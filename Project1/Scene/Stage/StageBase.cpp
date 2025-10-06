@@ -4,20 +4,20 @@
 #include <iostream> 
 #include <sstream>
 #include <vector>
-#include "../Application.h"
-#include "../Common/AsoUtility.h"
-#include "StageManager.h"
+#include "../../Application.h"
+#include "../../Common/AsoUtility.h"
+#include "../Stage/StageBase.h"
 
 
-StageManager::StageManager(void)
+StageBase::StageBase(void)
 {
 
 }
-StageManager::~StageManager(void)
+StageBase::~StageBase(void)
 {
 }
 // 初期化処理(最初の１回のみ実行)
-bool StageManager::SystemInit(void)
+bool StageBase::SystemInit(void)
 {
 	// マップチップデータを読み込む
 	int err = LoadDivGraph("image/map.bmp", MAP_CHIP_ALL_NUM,
@@ -27,7 +27,7 @@ bool StageManager::SystemInit(void)
 	return true;
 }
 // ゲーム起動・再開時に必ず呼び出す処理
-void StageManager::GameInit(void)
+void StageBase::GameInit(void)
 {
 	LoadGroundData(); // マップデータを読み込む 
 	LoadUnderGroundData();
@@ -37,11 +37,11 @@ void StageManager::GameInit(void)
 	mapDispStPos.x = mapDispStPos.y = 0;
 }
 // 更新処理
-void StageManager::Update(void)
+void StageBase::Update(void)
 {
 }
 // 描画処理
-void StageManager::Draw(void)
+void StageBase::Draw(void)
 {
 	// まず背景を黒で塗りつぶす
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, Application::SCREEN_SIZE_HIG, GetColor(0, 0, 0), true);
@@ -58,7 +58,7 @@ void StageManager::Draw(void)
 	}
 }
 // 解放処理(最後の１回のみ実行)
-bool StageManager::Release(void)
+bool StageBase::Release(void)
 {
 	// マップチップデータの解放
 	for (int ii = MAP_CHIP_ALL_NUM; ii > 0; ii--) {
@@ -67,7 +67,7 @@ bool StageManager::Release(void)
 	return true;
 }
 // マップの上方向に移動(画面は下にスクロール)
-void StageManager::MoveMapToUpper(int mov)
+void StageBase::MoveMapToUpper(int mov)
 {
 	mapDispStPos.y -= mov;
 	if (mapDispStPos.y < 0)
@@ -76,7 +76,7 @@ void StageManager::MoveMapToUpper(int mov)
 	}
 }
 // マップの下方向に移動(画面は上にスクロール)
-void StageManager::MoveMapToDown(int mov)
+void StageBase::MoveMapToDown(int mov)
 {
 	mapDispStPos.y += mov;
 	if (mapDispStPos.y + DSP_CHIP_NUM_Y >= MAP_GROUND_NUM_Y)
@@ -84,13 +84,13 @@ void StageManager::MoveMapToDown(int mov)
 
 }
 // マップの左方向に移動(画面は右にスクロール)
-void StageManager::MoveMapToLeft(int mov)
+void StageBase::MoveMapToLeft(int mov)
 {
 	mapDispStPos.x -= mov;
 	if (mapDispStPos.x < 0)mapDispStPos.x = 0;
 }
 // マップの右方向に移動(画面は左にスクロール)
-void StageManager::MoveMapToRight(int mov)
+void StageBase::MoveMapToRight(int mov)
 {
 	mapDispStPos.x += mov;
 	if (mapDispStPos.x + DSP_CHIP_NUM_X < MAP_GROUND_NUM_X)
@@ -98,7 +98,7 @@ void StageManager::MoveMapToRight(int mov)
 }
 
 // 外部ファイルからマップデータを読み込む処理
-bool StageManager::LoadGroundData(void)
+bool StageBase::LoadGroundData(void)
 {
 	// マップデータ読み込みバッファを初期化
 //	for (int yy = 0; yy < MAP_GROUND_NUM_Y; yy++) {
@@ -129,7 +129,7 @@ bool StageManager::LoadGroundData(void)
 	}
 	return true;
 }
-bool StageManager::LoadUnderGroundData(void)
+bool StageBase::LoadUnderGroundData(void)
 {
 	memset((int*)&underGroundMapDat[0], -1, sizeof(int) * (MAP_UNGROUND_NUM_X * MAP_UNGROUND_NUM_Y));
 	std::ifstream ifs = std::ifstream("data/UnGround.csv");
@@ -155,9 +155,9 @@ bool StageManager::LoadUnderGroundData(void)
 }
 
 
-int StageManager::GetMapChipNo(Vector2 mPos) { return dispMapDat[mPos.y][mPos.x]; }
+int StageBase::GetMapChipNo(Vector2 mPos) { return dispMapDat[mPos.y][mPos.x]; }
 
-void StageManager::ChangeMap(MAP_TYPE mtype)
+void StageBase::ChangeMap(MAP_TYPE mtype)
 {
 	ClearDispMap();
 
@@ -187,7 +187,7 @@ void StageManager::ChangeMap(MAP_TYPE mtype)
 		break;
 	}
 }
-void StageManager::ClearDispMap(void)
+void StageBase::ClearDispMap(void)
 {
 	for (int yy = 0; yy < MAP_MAX_NUM_Y; yy++) {
 		for (int xx = 0; xx < MAP_MAX_NUM_X; xx++) {

@@ -7,8 +7,8 @@ class Application
 public:
 
 	// スクリーンサイズ
-	static constexpr int SCREEN_SIZE_X = 800; // ゲーム画面の横サイズ
-	static constexpr int SCREEN_SIZE_Y = 600; // ゲーム画面の縦サイズ
+	static constexpr int SCREEN_SIZE_WID = 800; // ゲーム画面の横サイズ
+	static constexpr int SCREEN_SIZE_HIG = 600; // ゲーム画面の縦サイズ
 
 	static constexpr float FRAME_RATE = 1000.0f / 60.0f;
 

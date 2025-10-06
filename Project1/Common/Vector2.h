@@ -8,7 +8,6 @@ public:
 	int x;
 	int y;
 
-
 	//コンストラクタ
 	Vector2(void);
 

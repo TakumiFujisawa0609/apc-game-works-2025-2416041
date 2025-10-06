@@ -3,7 +3,7 @@
 class SceneManager;
 
 
-class Stage_1 : public SceneBase
+class Stage_1
 {
 public:
 	Stage_1(void);

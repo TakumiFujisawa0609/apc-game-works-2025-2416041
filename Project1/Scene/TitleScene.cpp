@@ -14,7 +14,7 @@ bool TitleScene::SystemInit(void)
 {
 	//SetTransColor(0xff, 0x00, 0xff);
 
-	bgImage = LoadGraph("image/title.bmp");
+	bgImage = LoadGraph(Application::PATH_SCENE+"Title_1.png");
 	if (bgImage == -1) {
 		return false;
 	}
@@ -39,8 +39,8 @@ void TitleScene::Update(void)
 
 void TitleScene::Draw(void)
 {
-	int dx = (Application::SCREEN_SIZE_X - TITLE_SIZE_WID) / 2;
-	int dy = (Application::SCREEN_SIZE_Y - TITLE_SIZE_HIG) / 2;
+	int dx = (Application::SCREEN_SIZE_WID - TITLE_SIZE_WID) / 2;
+	int dy = (Application::SCREEN_SIZE_HIG - TITLE_SIZE_HIG) / 2;
 	DrawGraph(dx, dy, bgImage, true);
 }
 

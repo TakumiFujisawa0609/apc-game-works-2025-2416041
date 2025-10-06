@@ -31,7 +31,7 @@ bool Application::SystemInit(void)
 {
 	//システム処理
 	SetWindowText("2416041 守口太一朗");
-	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
+	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);
 	//ゲームウインドウのサイズと色モードを設定
 	ChangeWindowMode(true);
 

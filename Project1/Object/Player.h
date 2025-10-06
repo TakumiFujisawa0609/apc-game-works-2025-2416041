@@ -1,28 +1,53 @@
 #pragma once
-#include "../Application.h"
+#include "../Common/Vector2.h"
+#include "../Common/AsoUtility.h"
+#include "../Scene/Stage/StageBase.h"
+#include "../Scene/SceneBase.h"
 class Player
 {
 public:
-	Player(void);
+	static constexpr int PLAYER_WID = 32; // プレイヤーの横サイズ
+	static constexpr int PLAYER_HIG = 32; // プレイヤーの縦サイズ
+	static constexpr int ANIM_NUMS = 8; // 方向毎のアニメーション数
+	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
+	static constexpr int MOVE_SPEED = 4; // 一回の移動量
+	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
+	static constexpr int PLAYER_HP_MAX = 100; // プレイヤーのHPの最大値
+	Player(GameScene* gs);
 	~Player(void);
-
-	void Init(void) ;
-	void Update(void);
-	void Draw(void);
-	void Release(void);
+	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
+	// ゲッター・セッター関数
+	Vector2 GetPlayerPos(void) { return playerPos; }
+	void SetPlayerPos(Vector2 mPos) { playerPos = mPos; }
+	AsoUtility::DIRECTION GetPlayerDir(void) { return static_cast<AsoUtility::DIRECTION>(playerDir); }
+	int GetHp(void) { return hp; } // HPの取得
+	bool GetAlive(void) { return aliveFlg; } // 生存状態の取得
+	void SetDamage(int dp);
 private:
+	GameScene* gInst;
+	// プレイヤー画像
+	int player_img_stand;  // 立ち止まり用
+	int player_img_walk;   // 歩行用
+	// プレイヤー表示座標
+	Vector2 playerPos;
+	// プレイヤーが向いている方向
+	int playerDir;
+	// アニメーションカウンター
+	int animCounter;
+	// ヒットポイント
+	int hp;
+	// 生存フラグ
+	bool aliveFlg;
 
-	const int PLAYER_SIZE_WID = 672;
-	const int PLAYER_SIZE_HIG = 84;
-	const int PLAYER_ANIM_XNUM = 7;
-	const int PLAYER_ANIM_YNUM = 1;
-	const int PLAYER_ANIM_MAX = PLAYER_ANIM_XNUM * PLAYER_ANIM_YNUM;
+	int drawX = playerPos.x - PLAYER_WID / 2;
+	int drawY = playerPos.y - PLAYER_HIG / 2;
 
-	const int PLAYER_MOVE_SPEED = 4;
+	bool isMoving;
 
-	int numberHandle_[7];
-	int playerPosX;
-	int playerPosY;
-	int i = 0;
+	int imgToDraw;
 };
 

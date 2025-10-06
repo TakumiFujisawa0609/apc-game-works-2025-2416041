@@ -29,7 +29,7 @@ void GameClear::Update(void)
 
 void GameClear::Draw(void)
 {
-	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0, imgClear_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_WID / 2, Application::SCREEN_SIZE_HIG / 2, 1.0, 0, imgClear_, true);
 
 }
 

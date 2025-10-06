@@ -1,9 +1,11 @@
 #pragma once
-#include "../StDefineData.h"
-#include "../Common/Vector2.h"
-#include "../Application.h"
 
-class StageManager
+#include "../../Application.h"
+#include "../../StDefineData.h"
+#include "../../Common/Vector2.h"
+
+
+class StageBase
 {
 public:
 	static constexpr int MAP_CHIP_SIZE_WID = 32; // マップチップ
@@ -41,7 +43,7 @@ public:
 
 
 
-	enum  MAP_TYPE {
+	enum class MAP_TYPE {
 		E_MTYPE_NON = -1,
 		E_MIYPE_GROUND,
 		E_MIYPE_UNDER_GROUND,
@@ -49,8 +51,8 @@ public:
 		E_MTYPE_MAX,
 	};
 
-	StageManager(void); // コンストラクタ
-	~StageManager(void); // デストラクタ
+	StageBase(void); // コンストラクタ
+	~StageBase(void); // デストラクタ
 
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
 	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
@@ -63,7 +65,7 @@ public:
 	Vector2 GetMapDispStPos(void) { return mapDispStPos; }
 	int GetMapChipNo(Vector2 mPos);
 	Vector2 GetDispMapSize(void) { return dispMapSize; }
-	StageManager::MAP_TYPE GetMapType(void) { return mapType; }
+	StageBase::MAP_TYPE GetMapType(void) { return mapType; }
 	bool IsStair(Vector2 mapPos) {
 		if (GetMapChipNo(mapPos) == MAP_CHIP_STAIR_NO)return true;
 		return false;
