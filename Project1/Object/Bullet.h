@@ -19,6 +19,7 @@ public:
 	static constexpr int BLAST_ANIM_MAX = BLAST_ANIM_XNUM * BLAST_ANIM_YNUM;
 	// 爆発アニメーションのパターン数
 	static constexpr int BLAST_ANIM_INTERVAL = 2; // 爆発アニメーションの更新間隔
+
 	// 弾の状態
 	enum class STATUS {
 		E_STAT_NONE,
@@ -27,6 +28,7 @@ public:
 		E_STAT_END, // 弾の動作終了
 		E_STAT_MAX,
 	};
+
 	Bullet(GameScene* gs);
 	~Bullet(void);
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
@@ -47,16 +49,22 @@ public:
 	void BlastOn(Vector2F pos);
 private:
 	GameScene* gInst; // ゲームシーンクラスのインスタンスのポインタ
+
 	int img[ANIM_NUMS]; // 弾の画像のハンドル番号テーブル
 	int blastImage[BLAST_ANIM_MAX]; // 爆発画像のハンドル番号テーブル
+
 	STATUS bNowStat; // 弾の状態
+
 	Vector2F bPos; // 弾の座標
 	Vector2F bVec; // 弾の移動方向のベクトル(単位ベクトル)
+
 	int bDir; // 弾の移動方向
 	int aliveCounter; // 弾の生存時間のカウンター
 	int animCounter; // 弾のアニメーションカウンター
 	int blastAnimCounter; // 爆発のアニメーションカウンター
+
 	Vector2F blastPos; // 爆発の座標
+
 	// 弾の状態毎の更新処理
 	void UpdateMove(void);
 	void UpdateBlast(void);

@@ -19,6 +19,7 @@ public:
 
 		E_TYPE_MAX,
 	};
+
 	static constexpr int ANIM_NUMS = 4; // 方向毎のアニメーション数
 	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔

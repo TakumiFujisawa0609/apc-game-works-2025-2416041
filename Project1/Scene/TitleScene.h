@@ -4,8 +4,8 @@
 class TitleScene
 {
 public:
-	static constexpr int TITLE_SIZE_WID = 600;
-	static constexpr int TITLE_SIZE_HIG = 250;
+	static constexpr int TITLE_SIZE_WID = 800;
+	static constexpr int TITLE_SIZE_HIG = 600;
 
 	TitleScene(void);
 	~TitleScene(void);

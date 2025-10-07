@@ -6,35 +6,50 @@
 
 GameClear::GameClear(void)
 {
-	
-
+	gameclearImage = -1;
 }
 
 GameClear::~GameClear(void)
 {
 }
 
-void GameClear::Init(void)
+bool GameClear::Init(void)
 {
-	imgClear_ = LoadGraph((Application::PATH_SCENE + "Clear_1.png").c_str());
-	
+	gameclearImage = LoadGraph("image/Gameclear.png");
+	if (gameclearImage == -1)return false;
+	return true;
+}
+
+void GameClear::GameInit(void)
+{
+	nextSceneID = E_SCENE_GAMECLEAR;
+	prevNextKey = nowNextKey = 0;
 }
 
 void GameClear::Update(void)
 {
-
-	
-
+	prevNextKey = nowNextKey;
+	nowNextKey = CheckHitKey(KEY_INPUT_SPACE);
+	// アップトリガーで判断
+	if (prevNextKey == 1 && nowNextKey == 0) {
+		nextSceneID = E_SCENE_TITLE;
+	}
 }
 
 void GameClear::Draw(void)
 {
-	DrawRotaGraph(Application::SCREEN_SIZE_WID / 2, Application::SCREEN_SIZE_HIG / 2, 1.0, 0, imgClear_, true);
-
+	int dx = (Application::SCREEN_SIZE_WID - GAMECLEAR_SIZE_WID) / 2;
+	int dy = (Application::SCREEN_SIZE_HIG - GAMECLEAR_SIZE_HIG) / 2;
+	DrawGraph(dx, dy, gameclearImage, true);
 }
 
-void GameClear::Release(void)
+bool GameClear::Release(void)
 {
-	DeleteGraph(imgClear_);
-	
+	if (DeleteGraph(gameclearImage) == -1)return false;
+	return false;
+}
+
+// ゲッター関数
+E_SCENE_ID GameClear::GetNextSceneID(void) {
+	return nextSceneID;
 }

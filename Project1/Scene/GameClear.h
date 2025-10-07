@@ -6,40 +6,26 @@
 
 class SceneManager;
 
-class GameClear : public SceneManager
+class GameClear
 {
 public:
-
-	// 定数
-	static const int BUTTON_WIDTH = 96;
-	static const int BUTTON_HEIGHT = 96;
-	static const int BUTTON_SPACING = 50;
-	static const int CLEAR_BUTTON_Y = Application::SCREEN_SIZE_WID * 3 / 5;
+	static constexpr int GAMECLEAR_SIZE_WID = 457; // ゲームオーバー画像の横サイズ
+	static constexpr int GAMECLEAR_SIZE_HIG = 81; // ゲームオーバー画像の縦サイズ
 
 	GameClear(void);
 	~GameClear(void);
-
-	void Init(void);
-	void Update(void);
-	void Draw(void) ;
-	void Release(void);
+	bool Init(void); // 初期化処理(最初の１回のみ実行)
+	void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
+	void Update(void); // 更新処理
+	void Draw(void); // 描画処理
+	bool Release(void); // 解放処理(最後の１回のみ実行)
+	E_SCENE_ID GetNextSceneID(void); // 次に遷移するシーンのIDを取得する
 
 private:
 
-
-	// ボタンの位置（Initで設定）
-	int homeX_;
-	int nextX_;
-	int retryX_;
-
-	// 画像ハンドル
-	int imgClear_;
-	int imgFramehover_;
-	int imgHomeDefault_;
-	int imgNextDefault_;
-	int imgReplayDefault_;
-
-	int prevSpacekey, nowSpacekey;
+	int gameclearImage; // ゲームクリア画像のハンドル番号
+	E_SCENE_ID nextSceneID; // 次に遷移するシーンのID
+	int prevNextKey, nowNextKey;
 };
 
 

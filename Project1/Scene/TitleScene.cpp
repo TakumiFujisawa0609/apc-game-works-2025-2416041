@@ -14,7 +14,7 @@ bool TitleScene::SystemInit(void)
 {
 	//SetTransColor(0xff, 0x00, 0xff);
 
-	bgImage = LoadGraph(Application::PATH_SCENE+"Title_1.png");
+	bgImage = LoadGraph((Application::PATH_SCENE + "Title_1.png").c_str());
 	if (bgImage == -1) {
 		return false;
 	}

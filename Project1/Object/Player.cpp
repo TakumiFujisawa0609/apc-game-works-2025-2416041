@@ -13,6 +13,7 @@ bool Player::SystemInit(void)
 {
 	player_img_stand = LoadGraph((Application::PATH_OBJECT + "player_stand.png").c_str());
 	player_img_walk = LoadGraph((Application::PATH_OBJECT + "player_walk.png").c_str());
+
 	return true;
 }
 // ゲーム起動・再開時に必ず呼び出す処理

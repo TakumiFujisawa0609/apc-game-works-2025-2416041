@@ -13,6 +13,7 @@ public:
 	static constexpr int MOVE_SPEED = 4; // 一回の移動量
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
 	static constexpr int PLAYER_HP_MAX = 100; // プレイヤーのHPの最大値
+
 	Player(GameScene* gs);
 	~Player(void);
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
@@ -20,6 +21,7 @@ public:
 	void Update(void); // 更新処理
 	void Draw(void); // 描画処理
 	bool Release(void); // 解放処理(最後の１回のみ実行)
+
 	// ゲッター・セッター関数
 	Vector2 GetPlayerPos(void) { return playerPos; }
 	void SetPlayerPos(Vector2 mPos) { playerPos = mPos; }

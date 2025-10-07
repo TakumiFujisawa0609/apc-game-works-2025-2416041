@@ -27,6 +27,7 @@ void EnemyBase::GameInit(void)
 	Vector2 rpos = gInst->GetLpStage()->GetMapDispStPos();
 	rpos.x *= StageBase::MAP_CHIP_SIZE_WID;
 	rpos.y *= StageBase::MAP_CHIP_SIZE_HIG;
+
 	switch (eDir) {
 	case AsoUtility::DIRECTION::E_DIR_UP:
 		rpos.x += GetRand(Application::SCREEN_SIZE_WID - 1);
@@ -43,6 +44,7 @@ void EnemyBase::GameInit(void)
 		rpos.y += GetRand(Application::SCREEN_SIZE_HIG - 1);
 		break;
 	}
+
 	pos.x = static_cast<float>(rpos.x);
 	pos.y = static_cast<float>(rpos.y);
 	animCounter = 0;

@@ -14,6 +14,7 @@
 //#include "EnemyLizardSmall.h"
 //#include "EnemyLizardBig.h"
 //#include "EnemyBoss.h"
+
 GameScene::GameScene(void)
 {
 	stage = nullptr;

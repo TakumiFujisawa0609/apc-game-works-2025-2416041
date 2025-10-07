@@ -3,6 +3,7 @@ class Fader;
 class TitleScene;
 class GameScene;
 class GameOverScene;
+class GameClear;
 class SceneManager
 {
 public:

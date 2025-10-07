@@ -3,7 +3,7 @@
 #include "GameOver.h"
 GameOverScene::GameOverScene(void)
 {
-	goImage = -1;
+	gameoverImage = -1;
 }
 GameOverScene::~GameOverScene(void)
 {
@@ -11,8 +11,8 @@ GameOverScene::~GameOverScene(void)
 // 初期化処理(最初の１回のみ実行)
 bool GameOverScene::SystemInit(void)
 {
-	goImage = LoadGraph("image/Gameover.png");
-	if (goImage == -1)return false;
+	gameoverImage = LoadGraph("image/Gameover.png");
+	if (gameoverImage == -1)return false;
 	return true;
 }
 // ゲーム起動・再開時に必ず呼び出す処理
@@ -36,12 +36,12 @@ void GameOverScene::Draw(void)
 {
 	int dx = (Application::SCREEN_SIZE_WID - GAMEOVER_SIZE_WID) / 2;
 	int dy = (Application::SCREEN_SIZE_HIG - GAMEOVER_SIZE_HIG) / 2;
-	DrawGraph(dx, dy, goImage, true);
+	DrawGraph(dx, dy, gameoverImage, true);
 }
 // 解放処理(最後の１回のみ実行)
 bool GameOverScene::Release(void)
 {
-	if (DeleteGraph(goImage) == -1)return false;
+	if (DeleteGraph(gameoverImage) == -1)return false;
 	return true;
 }
 // ゲッター関数
