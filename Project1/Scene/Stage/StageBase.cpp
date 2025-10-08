@@ -6,7 +6,7 @@
 #include <vector>
 #include "../../Application.h"
 #include "../../Common/AsoUtility.h"
-#include "../Stage/StageBase.h"
+#include "StageBase.h"
 
 
 StageBase::StageBase(void)
@@ -20,7 +20,7 @@ StageBase::~StageBase(void)
 bool StageBase::SystemInit(void)
 {
 	// マップチップデータを読み込む
-	int err = LoadDivGraph("image/map.bmp", MAP_CHIP_ALL_NUM,
+	int err = LoadDivGraph(((Application::PATH_DATA + "map.bmp").c_str()), MAP_CHIP_ALL_NUM,
 		MAP_CHIP_NUMS_X, MAP_CHIP_NUMS_Y,
 		MAP_CHIP_SIZE_WID, MAP_CHIP_SIZE_HIG, imgMapChipArray);
 	if (err == -1)return false;
@@ -30,7 +30,6 @@ bool StageBase::SystemInit(void)
 void StageBase::GameInit(void)
 {
 	LoadGroundData(); // マップデータを読み込む 
-	LoadUnderGroundData();
 
 	ChangeMap(MAP_TYPE::E_MIYPE_GROUND);
 
@@ -56,6 +55,8 @@ void StageBase::Draw(void)
 			DrawGraph(dx, dy, imgMapChipArray[chip], true);
 		}
 	}
+
+
 }
 // 解放処理(最後の１回のみ実行)
 bool StageBase::Release(void)
@@ -108,7 +109,7 @@ bool StageBase::LoadGroundData(void)
 //	}
 	memset((int*)&groundMapDat[0], -1, sizeof(int) * (MAP_GROUND_NUM_X * MAP_GROUND_NUM_Y));
 
-	std::ifstream ifs = std::ifstream("data/Ground2.csv");
+	std::ifstream ifs = std::ifstream((Application::PATH_DATA + "Ground2.csv").c_str());
 	if (!ifs)return false;
 
 	// ファイルを1行ずつ読み込む
@@ -124,30 +125,6 @@ bool StageBase::LoadGroundData(void)
 			chipNo = stoi(strSplit[xx]);
 			// 地上マップデータ(2次元配列)にマップチップ番号を格納する
 			groundMapDat[yy][xx] = chipNo;
-		}
-		yy++;
-	}
-	return true;
-}
-bool StageBase::LoadUnderGroundData(void)
-{
-	memset((int*)&underGroundMapDat[0], -1, sizeof(int) * (MAP_UNGROUND_NUM_X * MAP_UNGROUND_NUM_Y));
-	std::ifstream ifs = std::ifstream("data/UnGround.csv");
-	if (!ifs)return false;
-
-	// ファイルを1行ずつ読み込む
-	std::string line; // 1行の文字情報
-	std::vector<std::string> strSplit;// 1文字情報
-	int chipNo = 0;
-	int yy = 0;
-	while (getline(ifs, line)) {
-		// 1行の情報 string を ifstream の仲間に変換する
-		strSplit = AsoUtility::Split(line, ',');
-		for (int xx = 0; xx < strSplit.size(); xx++) {
-			// string から int に変換する
-			chipNo = stoi(strSplit[xx]);
-			// 地上マップデータ(2次元配列)にマップチップ番号を格納する
-			underGroundMapDat[yy][xx] = chipNo;
 		}
 		yy++;
 	}
@@ -171,17 +148,6 @@ void StageBase::ChangeMap(MAP_TYPE mtype)
 		for (int yy = 0; yy < dispMapSize.y; yy++) {
 			for (int xx = 0; xx < dispMapSize.x; xx++) {
 				dispMapDat[yy][xx] = groundMapDat[yy][xx];
-			}
-		}
-
-		break;
-	case MAP_TYPE::E_MIYPE_UNDER_GROUND:
-		dispMapSize.x = MAP_UNGROUND_NUM_X;
-		dispMapSize.y = MAP_UNGROUND_NUM_Y;
-
-		for (int yy = 0; yy < dispMapSize.y; yy++) {
-			for (int xx = 0; xx < dispMapSize.x; xx++) {
-				dispMapDat[yy][xx] = underGroundMapDat[yy][xx];
 			}
 		}
 		break;

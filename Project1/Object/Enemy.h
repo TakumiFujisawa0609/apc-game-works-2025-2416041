@@ -4,12 +4,12 @@
 #include "../Common/Vector2F.h"
 #include "../Common/AsoUtility.h"
 class GameScene;
-class EnemyBase
+class Enemy
 {
 public:
 	enum class ENEMY_TYPE
 	{
-		E_TYPE_SLIME,
+		E_TYPE_NORMAL,
 		E_TYPE_FLY,
 		E_TYPE_FIRE,
 		E_TYPE_LIZARD_SMALL,
@@ -23,8 +23,8 @@ public:
 	static constexpr int ANIM_NUMS = 4; // 方向毎のアニメーション数
 	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
-	EnemyBase(void);
-	~EnemyBase(void);
+	Enemy(void);
+	~Enemy(void);
 	virtual bool SystemInit(GameScene* gs); // 初期化処理(最初の１回のみ実行)
 	virtual void GameInit(void); // ゲーム起動・再開時に必ず呼び出す処理
 	virtual void Update(void); // 更新処理
@@ -52,7 +52,7 @@ protected:
 	GameScene* gInst; // ゲームシーンのインスタンスのポインタ
 
 	// 敵画像のハンドル番号テーブル
-	int img[static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX)][ANIM_NUMS];
+	int img[ANIM_NUMS];
 	// 敵表示座標
 	Vector2F pos;
 	// 敵が向いている方向

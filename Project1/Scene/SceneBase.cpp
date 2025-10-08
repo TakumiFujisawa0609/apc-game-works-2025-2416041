@@ -7,7 +7,7 @@
 #include "../Object/Player.h"
 #include "../Object/Bullet.h"
 #include "../Object/Enemy.h"
-//#include "EnemySlime.h"
+#include "../Object/Enemynormal.h"
 //#include "EnemyDragon.h"
 //#include "EnemyFly.h"
 //#include "EnemyFire.h"
@@ -85,16 +85,16 @@ void GameScene::Update(void)
 	if (enCounter > ENCOUNT) {
 
 		// 敵の生成
-		EnemyBase* e = nullptr;
+		Enemy* e = nullptr;
 
 		// ランダムに種別を決める
-		//int rr = GetRand(static_cast<int>(EnemyBase::ENEMY_TYPE::E_TYPE_MAX) - 1);
-		//EnemyBase::ENEMY_TYPE rType = static_cast<EnemyBase::ENEMY_TYPE>(rr);
+		int rr = GetRand(static_cast<int>(Enemy::ENEMY_TYPE::E_TYPE_MAX) - 1);
+		Enemy::ENEMY_TYPE rType = static_cast<Enemy::ENEMY_TYPE>(rr);
 		// 種別に対応した派生クラスのインスタンスを生成
-		//switch (rType) {
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_SLIME:
-		//	e = new EnemySlime();
-		//	break;
+		switch (rType) {
+		case Enemy::ENEMY_TYPE::E_TYPE_NORMAL:
+		e = new Enemynormal();
+			break;
 		//case EnemyBase::ENEMY_TYPE::E_TYPE_FLY:
 		//	e = new EnemyFly();
 		//	break;
@@ -113,15 +113,15 @@ void GameScene::Update(void)
 		//case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS:
 		//	e = new EnemyBoss();
 		//	break;
-		//}
+		}
 
-		//if (e != nullptr) {
-		//	e->SystemInit(this);
-		//	e->GameInit();
+		if (e != nullptr) {
+			e->SystemInit(this);
+			e->GameInit();
 			// 可変長配列に要素を追加する
-		//	enemys.push_back(e);
-		//	enCounter = 0; // エンカウンターをリセット
-		//}
+			enemys.push_back(e);
+			enCounter = 0; // エンカウンターをリセット
+		}
 	}
 	Vector2 playerPos = player->GetPlayerPos(); // 移動後のプレイヤーの位置
 	AsoUtility::DIRECTION pdir = player->GetPlayerDir(); // 移動方向を取得
@@ -168,7 +168,7 @@ void GameScene::Update(void)
 				enemys[ii - 1]->Release();
 				delete enemys[ii - 1];
 				//std::vector<Enemy*>::iterator itr;
-				std::vector<EnemyBase*>::iterator itr;
+				std::vector<Enemy*>::iterator itr;
 				itr = enemys.begin() + (ii - 1);
 				enemys.erase(itr);
 			}
@@ -179,33 +179,7 @@ void GameScene::Update(void)
 		EraseEnemys();
 		nextSceneID = E_SCENE_GAMEOVER;
 	}
-	//-------------------------------------------
-	// イベント処理
-	//-------------------------------------------
-	Vector2 mapPos = WorldPos2MapPos(playerPos);
-	if (stage->IsStair(mapPos)) {
-		// 階段地形に乗った
-		StageBase::MAP_TYPE nowTyp = stage->GetMapType();
-		switch (nowTyp) {
-		case StageBase::MAP_TYPE::E_MIYPE_GROUND:
-			// 現在地上にいる
-			playerPos.x = Player::PLAYER_WID / 2 + StageBase::MAP_CHIP_SIZE_WID;
-			playerPos.y = Player::PLAYER_HIG / 2 + StageBase::MAP_CHIP_SIZE_HIG;
-			player->SetPlayerPos(playerPos);
-			EraseEnemys();
-			enCounter = 0;
-			stage->ChangeMap(StageBase::MAP_TYPE::E_MIYPE_UNDER_GROUND);
-			break;
-		case StageBase::MAP_TYPE::E_MIYPE_UNDER_GROUND:
-			// 現在地下にいる
-			playerPos.x = Player::PLAYER_WID / 2 + StageBase::MAP_CHIP_SIZE_WID * 4;
-			playerPos.y = Player::PLAYER_HIG / 2 + StageBase::MAP_CHIP_SIZE_HIG * 6;
-			player->SetPlayerPos(playerPos);
-			enCounter = 0;
-			stage->ChangeMap(StageBase::MAP_TYPE::E_MIYPE_GROUND);
-			break;
-		}
-	}
+	
 
 }
 

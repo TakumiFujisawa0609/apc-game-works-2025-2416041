@@ -11,13 +11,13 @@ Player::~Player(void)
 // 初期化処理(最初の１回のみ実行)
 bool Player::SystemInit(void)
 {
-	int err = LoadDivGraph((Application::PATH_OBJECT + "player_stand.png").c_str(),
-		ANIM_NUMS,     // 総コマ数 = 6
-		ANIM_NUMS,     // 横方向 = 6
-		1,             // 縦方向 = 1
+	int err = LoadDivGraph((Application::PATH_OBJECT + "Player/player_stand.png").c_str(),
+		ANIM_NUMS,     // 総コマ数
+		ANIM_NUMS,     
+		1,             // 縦方向
 		PLAYER_WID,    // 112
 		PLAYER_HIG,    // 84
-		&player_img[0][0] // 配列先頭
+		player_img // 配列先頭
 	);
 
 	if (err == -1)
@@ -76,17 +76,18 @@ void Player::Draw(void)
 	Vector2 stpos = gInst->GetLpStage()->GetMapDispStPos();
 	DrawGraph(playerPos.x - PLAYER_WID / 2 - (stpos.x * StageBase::MAP_CHIP_SIZE_WID),
 		playerPos.y - PLAYER_HIG / 2 - (stpos.y * StageBase::MAP_CHIP_SIZE_HIG),
-		player_img[playerDir][animNo], true);
+		player_img[animNo], true);
 }
 // 解放処理(最後の１回のみ実行)
 bool Player::Release(void)
 {
-	for (int yy = static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX); yy > 0; yy--) {
-		for (int xx = ANIM_NUMS; xx > 0; xx--) {
-			if (DeleteGraph(player_img[yy - 1][xx - 1]) == -1)return false;
-		}
+	bool err = true;
+
+	for (auto& id : player_img) {
+		if (DeleteGraph(id) == -1) { err = false; }
 	}
-	return true;
+
+	return err;
 }
 // プレイヤーにダメージを与える
 // Input:

@@ -6,9 +6,9 @@
 class Player
 {
 public:
-	static constexpr int PLAYER_WID = 112; // プレイヤーの横サイズ
+	static constexpr int PLAYER_WID = 96; // プレイヤーの横サイズ
 	static constexpr int PLAYER_HIG = 84; // プレイヤーの縦サイズ
-	static constexpr int ANIM_NUMS = 6; // 方向毎のアニメーション数
+	static constexpr int ANIM_NUMS = 7; // 方向毎のアニメーション数
 	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
 	static constexpr int MOVE_SPEED = 4; // 一回の移動量
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
@@ -30,7 +30,7 @@ public:
 private:
 	GameScene* gInst;
 	// プレイヤー画像
-	int player_img[static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX)][ANIM_NUMS];
+	int player_img[ANIM_NUMS];
 	// プレイヤー表示座標
 	Vector2 playerPos;
 	// プレイヤーが向いている方向

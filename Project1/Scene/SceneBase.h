@@ -7,7 +7,7 @@
 
 class StageBase;
 class Player;
-class EnemyBase;
+class Enemy;
 class Bullet;
 
 class GameScene
@@ -42,9 +42,9 @@ private:
 	// EnemyBaseクラスのインスタンスのポインタの可変長テーブル
 
 	// 複数の敵を動的に管理する
-	std::vector<EnemyBase*> enemys;
+	std::vector<Enemy*> enemys;
 	// 敵の足元のY座標の小さい順にソートする為の可変長テーブル
-	std::list<EnemyBase*> enemysSortTbl;
+	std::list<Enemy*> enemysSortTbl;
 	// 敵の発生頻度用のカウンター
 	int enCounter;
 

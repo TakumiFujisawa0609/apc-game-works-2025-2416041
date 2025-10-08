@@ -2,25 +2,23 @@
 #include "Enemy.h"
 #include "../Scene/Stage/StageBase.h"
 #include "Player.h"
-EnemyBase::EnemyBase(void)
+Enemy::Enemy(void)
 {
 }
-EnemyBase::~EnemyBase(void)
+Enemy::~Enemy(void)
 {
 }
-bool EnemyBase::SystemInit(GameScene* gs)
+bool Enemy::SystemInit(GameScene* gs)
 {
 	gInst = gs;
 	SetEnemyParam(); // 敵キャラ個別のパラメータ設定処理
-	std::string path = "image/";
+	std::string path = Application::PATH_OBJECT +"Enemy/";
 	path += imgFName;
-	int err = LoadDivGraph(path.c_str(), CHARA_MAX,
-		ANIM_NUMS, static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX),
-		size.x, size.y, img[0]);
-	if (err == -1)return false;
+	LoadDivGraph(path.c_str(), ANIM_NUMS, ANIM_NUMS, 1, size.x, size.y, img);
+
 	return true;
 }
-void EnemyBase::GameInit(void)
+void Enemy::GameInit(void)
 {
 	dir = GetRand(static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX) - 1);
 	AsoUtility::DIRECTION eDir = static_cast<AsoUtility::DIRECTION>(dir);
@@ -50,7 +48,7 @@ void EnemyBase::GameInit(void)
 	animCounter = 0;
 	aliveFlg = true;
 }
-void EnemyBase::Update(void)
+void Enemy::Update(void)
 {
 	animCounter++;
 	if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 100)animCounter = 0;
@@ -99,7 +97,7 @@ void EnemyBase::Update(void)
 #endif
 	}
 }
-void EnemyBase::Draw(void)
+void Enemy::Draw(void)
 {
 	int animNo = (animCounter / ANIM_INTERVAL) % ANIM_NUMS;
 	Vector2 stpos = gInst->GetLpStage()->GetMapDispStPos();
@@ -109,18 +107,18 @@ void EnemyBase::Draw(void)
 
 	DrawGraph(ePos.x - size.x / 2 - (stpos.x * StageBase::MAP_CHIP_SIZE_WID),
 		ePos.y - size.y / 2 - (stpos.y * StageBase::MAP_CHIP_SIZE_HIG),
-		img[dir][animNo], true);
+		img[dir],true);
 }
-bool EnemyBase::Release(void)
+bool Enemy::Release(void)
 {
 	for (int yy = static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX); yy > 0; yy--) {
 		for (int xx = ANIM_NUMS; xx > 0; xx--) {
-			if (DeleteGraph(img[yy - 1][xx - 1]) == -1)return false;
+			if (DeleteGraph(img[yy - 1]) == -1)return false;
 		}
 	}
 	return true;
 }
-void EnemyBase::SetDamege(int dp)
+void Enemy::SetDamege(int dp)
 {
 	hp -= dp;
 	if (hp <= 0) {
@@ -128,7 +126,7 @@ void EnemyBase::SetDamege(int dp)
 		aliveFlg = false;
 	}
 }
-void EnemyBase::SetMoveDirection(Vector2F edir)
+void Enemy::SetMoveDirection(Vector2F edir)
 {
 	if (abs(edir.x) < abs(edir.y)) {
 		// 上下

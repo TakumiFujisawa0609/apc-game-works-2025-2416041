@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Object\Enemynormal.cpp" />
     <ClCompile Include="Object\Bullet.cpp" />
     <ClCompile Include="Common\AsoUtility.cpp" />
     <ClCompile Include="Common\Fader.cpp" />
@@ -145,7 +146,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Manager\SceneManager.cpp" />
     <ClCompile Include="Manager\SoundManager.cpp" />
-    <ClCompile Include="Manager\StageManager.cpp" />
     <ClCompile Include="Common\Vector2.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="Scene\Stage\Stage_1.cpp" />
@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Object\Enemynormal.h" />
     <ClInclude Include="Object\Bullet.h" />
     <ClInclude Include="Common\AsoUtility.h" />
     <ClInclude Include="Common\Collision.h" />
@@ -166,7 +167,6 @@
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\SoundManager.h" />
-    <ClInclude Include="Manager\StageManager.h" />
     <ClInclude Include="Common\Vector2.h" />
     <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="Scene\Stage\Stage_1.h" />

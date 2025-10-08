@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../../Application.h"
 #include "../../StDefineData.h"
 #include "../../Common/Vector2.h"
-
+#include "../../Application.h"
 
 class StageBase
 {
@@ -18,9 +17,6 @@ public:
 	static constexpr int MAP_GROUND_NUM_X = 30; // 地上のマップサイズ横
 	static constexpr int MAP_GROUND_NUM_Y = 30; // 地上のマップサイズ縦
 
-	static constexpr int MAP_UNGROUND_NUM_X = 10; // 地上のマップサイズ横
-	static constexpr int MAP_UNGROUND_NUM_Y = 10; // 地上のマップサイズ縦
-
 	static constexpr int DSP_CHIP_NUM_X = Application::SCREEN_SIZE_WID / MAP_CHIP_SIZE_WID;
 	static constexpr int DSP_CHIP_NUM_Y = Application::SCREEN_SIZE_HIG / MAP_CHIP_SIZE_HIG + 1;
 
@@ -33,7 +29,6 @@ public:
 	static constexpr int  MAP_CHIP_STAIR_NO = 15;
 
 	bool LoadGroundData(void); // 外部ファイルからマップデータを読み込む
-	bool LoadUnderGroundData(void);
 
 	// ゲッター・セッター関数
 	void MoveMapToUpper(int mov); // マップの上方向に移動(画面は下にスクロール)
@@ -43,10 +38,9 @@ public:
 
 
 
-	enum class MAP_TYPE {
+	enum  MAP_TYPE {
 		E_MTYPE_NON = -1,
 		E_MIYPE_GROUND,
-		E_MIYPE_UNDER_GROUND,
 
 		E_MTYPE_MAX,
 	};
@@ -85,8 +79,6 @@ private:
 
 	// 地上マップデータ
 	int groundMapDat[MAP_GROUND_NUM_Y][MAP_GROUND_NUM_X];
-
-	int underGroundMapDat[MAP_UNGROUND_NUM_Y][MAP_UNGROUND_NUM_X];
 
 	Vector2 mapDispStPos; // マップ表示開始座標 
 
