@@ -6,14 +6,13 @@
 class Player
 {
 public:
-	static constexpr int PLAYER_WID = 32; // プレイヤーの横サイズ
-	static constexpr int PLAYER_HIG = 32; // プレイヤーの縦サイズ
-	static constexpr int ANIM_NUMS = 8; // 方向毎のアニメーション数
+	static constexpr int PLAYER_WID = 112; // プレイヤーの横サイズ
+	static constexpr int PLAYER_HIG = 84; // プレイヤーの縦サイズ
+	static constexpr int ANIM_NUMS = 6; // 方向毎のアニメーション数
 	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
 	static constexpr int MOVE_SPEED = 4; // 一回の移動量
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
 	static constexpr int PLAYER_HP_MAX = 100; // プレイヤーのHPの最大値
-
 	Player(GameScene* gs);
 	~Player(void);
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
@@ -21,7 +20,6 @@ public:
 	void Update(void); // 更新処理
 	void Draw(void); // 描画処理
 	bool Release(void); // 解放処理(最後の１回のみ実行)
-
 	// ゲッター・セッター関数
 	Vector2 GetPlayerPos(void) { return playerPos; }
 	void SetPlayerPos(Vector2 mPos) { playerPos = mPos; }
@@ -32,8 +30,7 @@ public:
 private:
 	GameScene* gInst;
 	// プレイヤー画像
-	int player_img_stand;  // 立ち止まり用
-	int player_img_walk;   // 歩行用
+	int player_img[static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX)][ANIM_NUMS];
 	// プレイヤー表示座標
 	Vector2 playerPos;
 	// プレイヤーが向いている方向
@@ -44,12 +41,5 @@ private:
 	int hp;
 	// 生存フラグ
 	bool aliveFlg;
-
-	int drawX = playerPos.x - PLAYER_WID / 2;
-	int drawY = playerPos.y - PLAYER_HIG / 2;
-
-	bool isMoving;
-
-	int imgToDraw;
 };
 
