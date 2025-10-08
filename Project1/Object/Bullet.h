@@ -6,9 +6,9 @@ class GameScene;
 class Bullet
 {
 public:
-	static constexpr int BULLET_SIZE_WID = 12; // 弾の横サイズ
-	static constexpr int BULLET_SIZE_HIG = 12; // 弾の縦サイズ
-	static constexpr int ANIM_NUMS = 2; // 弾のアニメーション数
+	static constexpr int BULLET_SIZE_WID = 60; // 弾の横サイズ
+	static constexpr int BULLET_SIZE_HIG = 40; // 弾の縦サイズ
+	//static constexpr int ANIM_NUMS = 2; // 弾のアニメーション数
 	static constexpr float MOVE_SPEED = 5.0f; // 移動速度
 	static constexpr int ANIM_INTERVAL = 5; // 弾のアニメーションの更新間隔
 	static constexpr int ALIVE_TIME = 30; // 弾の生存時間
@@ -47,10 +47,11 @@ public:
 	Vector2F GetBulletPos(void) { return bPos; }
 	// 爆発表示開始
 	void BlastOn(Vector2F pos);
+	
 private:
 	GameScene* gInst; // ゲームシーンクラスのインスタンスのポインタ
 
-	int img[ANIM_NUMS]; // 弾の画像のハンドル番号テーブル
+	int img; // 弾の画像のハンドル番号テーブル
 	int blastImage[BLAST_ANIM_MAX]; // 爆発画像のハンドル番号テーブル
 
 	STATUS bNowStat; // 弾の状態

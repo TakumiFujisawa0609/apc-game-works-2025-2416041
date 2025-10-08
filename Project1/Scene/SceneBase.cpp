@@ -19,7 +19,7 @@ GameScene::GameScene(void)
 {
 	stage = nullptr;
 	player = nullptr;
-	bullet = nullptr;
+	
 }
 
 GameScene::~GameScene(void)
@@ -33,12 +33,16 @@ bool GameScene::SystemInit(void)
 	if (stage == nullptr)return false;
 	player = new Player(this);
 	if (player == nullptr)return false;
-	bullet = new Bullet(this);
-	if (bullet == nullptr)return false;
 
 	if (stage->SystemInit() == -1)return false;
 	player->SystemInit();
-	bullet->SystemInit();
+	
+	// 弾の共通リソース読み込み（画像など）
+	Bullet* tmp = new Bullet(this);
+	if (!tmp->SystemInit()) return false;
+	delete tmp; // 個別弾は Update() で生成
+	bullets.clear();
+
 	return true;
 }
 
@@ -47,7 +51,14 @@ void GameScene::GameInit(void)
 {
 	stage->GameInit();
 	player->GameInit();
-	bullet->GameInit();
+
+	// 弾の初期化
+	for (auto& b : bullets) { // もし既に残っている弾があれば削除
+		b->Release();
+		delete b;
+	}
+
+	bullets.clear();
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
@@ -59,20 +70,42 @@ void GameScene::Update(void)
 	Vector2 oldPos = player->GetPlayerPos(); // 移動前のプレイヤーの位置
 	stage->Update();
 	player->Update();
-	// 弾の発射処理
-	if (bullet->IsEnableCreate()) {
-		// 発射可能な状態
-		prevShotKey = nowShotKey;
-		nowShotKey = CheckHitKey(KEY_INPUT_SPACE);
-		// ダウントリガーで判定
-		if (prevShotKey == 0 && nowShotKey == 1) {
-			// 弾の発射(生成する)
-			Vector2 vec = player->GetPlayerPos();
-			Vector2F vecf(static_cast<float>(vec.x), static_cast<float>(vec.y));
-			bullet->Create(vecf, player->GetPlayerDir());
-		}
+
+	static int shotTimer = 0;
+	const int SHOT_INTERVAL = 30;
+
+	shotTimer++;
+	if (shotTimer >= SHOT_INTERVAL)
+	{
+		shotTimer = 0;
+		Bullet* newBullet = new Bullet(this);
+		newBullet->SystemInit();
+		newBullet->GameInit();
+
+		Vector2 pos = player->GetPlayerPos();
+		Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
+		newBullet->Create(posF, player->GetPlayerDir());
+
+		bullets.push_back(newBullet);
 	}
-	bullet->Update();
+
+	// 弾の更新
+	for (auto& b : bullets) b->Update();
+
+	// 終了した弾を削除
+	bullets.erase(
+		std::remove_if(bullets.begin(), bullets.end(),
+			[](Bullet* b) {
+				if (b->IsEnableCreate()) {
+					b->Release();
+					delete b;
+					return true;
+				}
+				return false;
+			}),
+		bullets.end()
+	);
+
 
 	// 敵の更新
 	size_t size = enemys.size(); // 敵のテーブルの要素数を取得
@@ -193,7 +226,8 @@ void GameScene::Draw(void)
 	for (int ii = 0; ii < size; ii++) {
 		enemys[ii]->Draw();
 	}
-	bullet->Draw();
+	for (auto& b : bullets) b->Draw();
+
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	int php = player->GetHp();
 	DrawFormatString(32, 0, GetColor(0xff, 0xff, 0xff), "プレイヤーＨＰ：%3d", php);
@@ -218,9 +252,11 @@ bool GameScene::Release(void)
 	// 敵の解放
 	EraseEnemys();
 	// インスタンスの解放
-	bullet->Release();
-	delete bullet;
-	bullet = nullptr;
+	for (auto& b : bullets) {
+		b->Release();
+		delete b;
+	}
+	bullets.clear();
 	player->Release();
 	delete player;
 	player = nullptr;
@@ -363,42 +399,34 @@ bool GameScene::IsCollisionStage(Vector2 worldPos)
  */
 void GameScene::CollisionCheck(void)
 {
-	// 弾の情報
-	Vector2F pos = bullet->GetBulletPos();
-	Vector2 bPos = AsoUtility::Round(pos);
-	Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
-
-	// プレイヤーの情報
 	Vector2 pPos = player->GetPlayerPos();
 	Vector2 pSize = { Player::PLAYER_WID, Player::PLAYER_HIG };
 
-	// 敵の数だけチェックを行う
-	size_t size = enemys.size();
-	for (int ii = 0; ii < size; ii++) {
-		pos = enemys[ii]->GetEnemyPos();
-		if (!enemys[ii]->GetAlive())continue;
-		Vector2 ePos = AsoUtility::Round(pos);
-		Vector2 eSize = enemys[ii]->GetEnemySize();
+	// 敵の数だけチェック
+	for (auto& e : enemys) {
+		if (!e->GetAlive()) continue;
+		Vector2 ePos = AsoUtility::Round(e->GetEnemyPos());
+		Vector2 eSize = e->GetEnemySize();
 
-		// 敵とプレイヤーの弾の衝突判定
-		if (bullet->IsShotState()) {
-			// 弾を発射している
+		// 弾との判定
+		for (auto& b : bullets) {
+			if (!b->IsShotState()) continue;
+			Vector2 bPos = AsoUtility::Round(b->GetBulletPos());
+			Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
+
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
-				//enemys[ii]->SetAlive(false);
-				enemys[ii]->SetDamege(4);
-				bullet->BlastOn(bullet->GetBulletPos());
+				e->SetDamege(4);
+				b->BlastOn(b->GetBulletPos());
 			}
 		}
 
-		if (!enemys[ii]->GetAlive())continue;
-		// 敵とプレイヤーの衝突判定
+		// プレイヤーとの衝突判定
+		if (!e->GetAlive()) continue;
 		if (CollisionCheckRectCenter(pPos, pSize, ePos, eSize)) {
-			player->SetDamage(1); // プレイヤーにダメージを与える
+			player->SetDamage(1);
 		}
 
-		if (!player->GetAlive()) {
-			break;
-		}
+		if (!player->GetAlive()) break;
 	}
 }
 

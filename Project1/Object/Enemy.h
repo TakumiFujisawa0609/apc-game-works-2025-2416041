@@ -37,6 +37,10 @@ public:
 	// 敵の座標を取得
 	virtual Vector2F GetEnemyPos(void) { return pos; }
 
+	Vector2F GetEnemyPosF() const {
+		return { static_cast<float>(pos.x), static_cast<float>(pos.y) };
+	}
+
 	// 敵の画像サイズを取得
 	virtual Vector2 GetEnemySize(void) { return size; }
 

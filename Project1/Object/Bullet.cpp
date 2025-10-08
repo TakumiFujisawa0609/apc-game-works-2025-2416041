@@ -3,6 +3,8 @@
 #include "../Scene/SceneBase.h"
 #include "../Scene/Stage/StageBase.h"
 #include "Player.h"
+#include "../Application.h"
+#include "../Object/Enemy.h"
 /*
  *----------------------------------------------------
  * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
@@ -22,9 +24,10 @@ Bullet::~Bullet(void)
 // ‰Šú‰»ˆ—(Å‰‚Ì‚P‰ñ‚Ì‚ÝŽÀs)
 bool Bullet::SystemInit(void)
 {
-	int err = LoadDivGraph("image/shot.bmp", ANIM_NUMS, ANIM_NUMS, 1, BULLET_SIZE_WID, BULLET_SIZE_HIG, img);
-	if (err == -1)return false;
-	err = LoadDivGraph("image/Blast.png", BLAST_ANIM_MAX, BLAST_ANIM_XNUM, BLAST_ANIM_YNUM,
+	img = LoadGraph((Application::PATH_OBJECT + "weapon/sword.png").c_str());
+	if (img == -1) return false; // “Ç‚Ýž‚ÝŽ¸”sƒ`ƒFƒbƒN
+
+	int err = LoadDivGraph("image/Blast.png", BLAST_ANIM_MAX, BLAST_ANIM_XNUM, BLAST_ANIM_YNUM,
 		BLAST_SIZE_WID, BLAST_SIZE_HIG, blastImage);
 	if (err == -1)return false;
 	return true;
@@ -101,14 +104,13 @@ void Bullet::Draw(void)
 // ’e‚Ìó‘Ô–ˆ‚Ì•`‰æˆ—
 void Bullet::DrawMove(void)
 {
-	int animNo = (animCounter / ANIM_INTERVAL) % ANIM_NUMS;
 	Vector2 mapSPos = gInst->GetLpStage()->GetMapDispStPos();
 	// À•W‚ðintŒ^‚É•ÏŠ·‚·‚é
 	Vector2 pos;
 	pos = AsoUtility::Round(bPos);
 	DrawGraph(pos.x - BULLET_SIZE_WID / 2 - mapSPos.x * StageBase::MAP_CHIP_SIZE_WID,
 		pos.y - BULLET_SIZE_HIG / 2 - mapSPos.y * StageBase::MAP_CHIP_SIZE_HIG,
-		img[animNo], true);
+		img, true);
 }
 void Bullet::DrawBlast(void)
 {
@@ -127,9 +129,8 @@ void Bullet::DrawEnd(void)
 // ‰ð•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚ÝŽÀs)
 bool Bullet::Release(void)
 {
-	for (int ii = ANIM_NUMS - 1; ii >= 0; ii--) {
-		if (DeleteGraph(img[ii]) == -1)return false;
-	}
+	DeleteGraph(img);
+
 	for (int ii = BLAST_ANIM_MAX - 1; ii >= 0; ii--) {
 		if (DeleteGraph(blastImage[ii]) == -1)return false;
 	}
@@ -204,3 +205,5 @@ void Bullet::BlastOn(Vector2F pos)
 	blastPos = pos;
 	ChangeStatus(Bullet::STATUS::E_STAT_BLAST);
 }
+
+
