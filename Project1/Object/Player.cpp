@@ -77,6 +77,10 @@ void Player::Draw(void)
 	DrawGraph(playerPos.x - PLAYER_WID / 2 - (stpos.x * StageBase::MAP_CHIP_SIZE_WID),
 		playerPos.y - PLAYER_HIG / 2 - (stpos.y * StageBase::MAP_CHIP_SIZE_HIG),
 		player_img[animNo], true);
+
+	for (int i = 0;i < hp; i++) {
+		DrawBox(50 + (i * 5), Application::SCREEN_SIZE_HIG-30, 70 + (i + 5), Application::SCREEN_SIZE_WID, GetColor(255, 1, 1), true);
+	}
 }
 // ‰ð•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚ÝŽÀs)
 bool Player::Release(void)
