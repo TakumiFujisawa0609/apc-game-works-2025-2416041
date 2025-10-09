@@ -37,6 +37,9 @@ void GameOverScene::Draw(void)
 	int dx = (Application::SCREEN_SIZE_WID - GAMEOVER_SIZE_WID) / 2;
 	int dy = (Application::SCREEN_SIZE_HIG - GAMEOVER_SIZE_HIG) / 2;
 	DrawGraph(dx, dy, gameoverImage, true);
+
+	DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "ゲームオーバー",
+		dx, dy, dx, dy);
 }
 // 解放処理(最後の１回のみ実行)
 bool GameOverScene::Release(void)

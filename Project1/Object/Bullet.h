@@ -27,6 +27,7 @@ public:
 		E_STAT_BLAST, // ”š”­
 		E_STAT_END, // ’e‚Ì“®ìI—¹
 		E_STAT_MAX,
+		
 	};
 
 	Bullet(GameScene* gs);

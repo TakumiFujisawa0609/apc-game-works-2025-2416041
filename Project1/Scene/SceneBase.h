@@ -52,6 +52,10 @@ private:
     int prevShotKey;
     int nowShotKey;
 
+    int startTime;      // 開始時間（ミリ秒）
+    int limitTime;      // 制限時間（ミリ秒）
+    bool isClear;       // クリア判定
+
     // シーン遷移ID
     E_SCENE_ID nextSceneID;
 

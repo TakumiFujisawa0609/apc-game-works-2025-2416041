@@ -4,12 +4,14 @@
 #include "../Scene/TitleScene.h"
 #include "../Scene/SceneBase.h"
 #include "../Scene/GameOver.h"
+#include "../Scene/GameClear.h"
 SceneManager::SceneManager(void)
 {
 	fader = nullptr;
 	titleInst = nullptr;
 	gameInst = nullptr;
 	gameover = nullptr;
+	gameclear = nullptr;
 	scene_ID = waitScene = E_SCENE_NON;
 }
 SceneManager::~SceneManager(void)
@@ -61,6 +63,10 @@ void SceneManager::Update(void)
 			gameover->Update();
 			nextSceneID = gameover->GetNextSceneID();
 			break;
+		case E_SCENE_GAMECLEAR:
+			gameclear->Update();
+			nextSceneID = gameclear->GetNextSceneID();
+			break;
 		}
 		// ƒV[ƒ“‘JˆÚ”»’è
 		if (scene_ID != nextSceneID) {
@@ -82,6 +88,9 @@ void SceneManager::Draw(void)
 		break;
 	case E_SCENE_GAMEOVER:
 		gameover->Draw();
+		break;
+	case E_SCENE_GAMECLEAR:
+		gameclear->Draw();
 		break;
 	}
 	fader->Draw();
@@ -130,6 +139,14 @@ bool SceneManager::ChangeScene(E_SCENE_ID id)
 			gameover->GameInit();
 		}
 		break;
+	case E_SCENE_GAMECLEAR:
+		if (gameclear == nullptr) {
+			gameclear = new GameClear();
+			if (gameclear == nullptr)return false;
+			gameclear->Init();
+			gameclear->GameInit();
+		}
+		break;
 	}
 	return true;
 }
@@ -155,6 +172,13 @@ void SceneManager::ReleaseScene(E_SCENE_ID id)
 			gameover->Release();
 			delete gameover;
 			gameover = nullptr;
+		}
+		break;
+	case E_SCENE_GAMECLEAR:	
+		if (gameclear != nullptr) {
+			gameclear->Release();
+			delete gameclear;
+			gameclear = nullptr;
 		}
 		break;
 	}

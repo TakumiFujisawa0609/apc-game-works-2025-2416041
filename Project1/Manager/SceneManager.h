@@ -19,6 +19,7 @@ private:
 	TitleScene* titleInst; // タイトルシーンクラスのインスタンスのポインタ
 	GameScene* gameInst; // ゲームシーンクラスのインスタンスのポインタ
 	GameOverScene* gameover; // ゲームオーバーシーンクラスのインスタンスのポインタ
+	GameClear* gameclear; // ゲームクリアシーンクラスのインスタンスのポインタ
 
 	E_SCENE_ID scene_ID; // 現在のシーンID
 	E_SCENE_ID waitScene; // シーンチェンジで次に遷移するシーンのID

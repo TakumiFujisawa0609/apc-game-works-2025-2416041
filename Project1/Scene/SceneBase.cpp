@@ -62,6 +62,11 @@ void GameScene::GameInit(void)
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
+
+	//制限時間タイマー初期化
+	startTime = GetNowCount();
+	limitTime = 30000; // 30秒耐久でクリア
+	isClear = false;
 }
 
 // 更新処理
@@ -192,6 +197,14 @@ void GameScene::Update(void)
 	}
 	MapScrollProc();
 
+	int elapsed = GetNowCount() - startTime;
+	int remain = limitTime - elapsed;
+
+	if (remain <= 0 && !isClear) {
+		isClear = true;
+		nextSceneID = E_SCENE_GAMECLEAR; // ← クリアシーンに遷移
+	}
+
 	// 衝突判定
 	CollisionCheck();
 	if (player->GetAlive()) {
@@ -230,7 +243,11 @@ void GameScene::Draw(void)
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	int php = player->GetHp();
-	DrawFormatString(32, 0, GetColor(0xff, 0xff, 0xff), "プレイヤーＨＰ：%3d", php);
+	// 残り時間を表示
+	int elapsed = GetNowCount() - startTime;
+	int remain = max(0, limitTime - elapsed);
+	DrawFormatString(300, 0, GetColor(255, 255, 255),
+		"残り時間：%.2f秒", remain / 1000.0f);
 	//-----------------------------------------------------------------------
 	// デバッグ用
 	Vector2 pPos = player->GetPlayerPos();

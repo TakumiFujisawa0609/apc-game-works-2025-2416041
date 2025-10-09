@@ -41,6 +41,11 @@ void GameClear::Draw(void)
 	int dx = (Application::SCREEN_SIZE_WID - GAMECLEAR_SIZE_WID) / 2;
 	int dy = (Application::SCREEN_SIZE_HIG - GAMECLEAR_SIZE_HIG) / 2;
 	DrawGraph(dx, dy, gameclearImage, true);
+
+
+
+	DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "ÉQÅ[ÉÄÉNÉäÉA",
+		dx, dy, dx, dy);
 }
 
 bool GameClear::Release(void)
