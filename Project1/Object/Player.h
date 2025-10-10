@@ -3,6 +3,10 @@
 #include "../Common/AsoUtility.h"
 #include "../Scene/Stage/StageBase.h"
 #include "../Scene/SceneBase.h"
+#include "Bullet.h"
+
+class Bullet;
+class GameScene;
 class Player
 {
 public:
@@ -29,6 +33,7 @@ public:
 	void SetDamage(int dp);
 private:
 	GameScene* gInst;
+	Bullet* bullet; // 弾クラスのインスタンスのポインタ
 	// プレイヤー画像
 	int player_img[ANIM_NUMS];
 	// プレイヤー表示座標

@@ -1,12 +1,18 @@
 #include <DxLib.h>
 #include "Player.h"
 #include "../Application.h"
+#include "../Scene/SceneBase.h"
+#include "Bullet.h"
 Player::Player(GameScene* gs)
 {
+	bullet = new Bullet(gs);
+	bullet->SystemInit();
 	gInst = gs;
 }
 Player::~Player(void)
 {
+	bullet->Release();
+	delete bullet;
 }
 // ‰Šú‰»ˆ—(Å‰‚Ì‚P‰ñ‚Ì‚İÀs)
 bool Player::SystemInit(void)
@@ -68,6 +74,13 @@ void Player::Update(void)
 		}
 		playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_RIGHT);
 	}
+	// UŒ‚ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚ç
+	if (CheckHitKey(KEY_INPUT_Z))
+	{
+		// ’e‚ğ¶¬
+		bullet->CreateOrbit(GetPosition(), 50.0f, 0.1f, 120);
+	}
+	bullet->Update();
 }
 // •`‰æˆ—
 void Player::Draw(void)
@@ -81,6 +94,10 @@ void Player::Draw(void)
 	for (int i = 0;i < hp; i++) {
 		DrawBox(50 + (i * 5), Application::SCREEN_SIZE_HIG-30, 70 + (i + 5), Application::SCREEN_SIZE_WID, GetColor(255, 1, 1), true);
 	}
+
+	bullet->Draw();
+
+	
 }
 // ‰ğ•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚İÀs)
 bool Player::Release(void)
@@ -106,3 +123,4 @@ void Player::SetDamage(int dp)
 		aliveFlg = false;
 	}
 }
+

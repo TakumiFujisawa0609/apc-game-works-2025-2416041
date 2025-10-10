@@ -2,6 +2,7 @@
 #include "../Common/Vector2.h"
 #include "../Common/Vector2F.h"
 #include "../Common/AsoUtility.h"
+#include "../Object/Player.h"
 class GameScene;
 class Bullet
 {
@@ -48,6 +49,7 @@ public:
 	Vector2F GetBulletPos(void) { return bPos; }
 	// 爆発表示開始
 	void BlastOn(Vector2F pos);
+	void CreateOrbit(Vector2F center, float rad, float speed, int time);
 	
 private:
 	GameScene* gInst; // ゲームシーンクラスのインスタンスのポインタ
@@ -77,6 +79,14 @@ private:
 	void DrawEnd(void);
 	// 状態を遷移させる
 	void ChangeStatus(STATUS stat);
+
+	// 円運動用
+	bool isOrbit = false;         // 円運動中かどうか
+	Vector2F centerPos;           // 回る中心座標（プレイヤーの座標）
+	float radius = 50.0f;         // 回る半径
+	float angle = 0.0f;           // 現在の角度
+	float angularSpeed = 0.1f;    // 回転速度（ラジアン/frame）
+	int orbitTime = 120;           // 回る時間（フレーム）
 };
 
 

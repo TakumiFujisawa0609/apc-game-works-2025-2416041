@@ -61,16 +61,36 @@ void Bullet::Update(void)
 // 弾の状態毎の更新処理
 void Bullet::UpdateMove(void)
 {
-	// 座標に移動量を加える
-	bPos.x += bVec.x * MOVE_SPEED;
-	bPos.y += bVec.y * MOVE_SPEED;
-	// 弾の生存判定
-	aliveCounter--;
-	if (aliveCounter < 0) {
-		blastPos = bPos;
-		// 状態を爆発に移行
-		ChangeStatus(Bullet::STATUS::E_STAT_BLAST);
+	if (isOrbit)
+	{
+		// 円運動
+		angle += angularSpeed;
+		bPos.x = centerPos.x + cosf(angle) * radius;
+		bPos.y = centerPos.y + sinf(angle) * radius;
+
+		// 生存時間管理
+		orbitTime--;
+		if (orbitTime <= 0)
+		{
+			isOrbit = false;
+			blastPos = bPos;
+			ChangeStatus(STATUS::E_STAT_BLAST);
+		}
 	}
+	else
+	{
+		// 通常の直線移動
+		bPos.x += bVec.x * MOVE_SPEED;
+		bPos.y += bVec.y * MOVE_SPEED;
+
+		aliveCounter--;
+		if (aliveCounter < 0)
+		{
+			blastPos = bPos;
+			ChangeStatus(STATUS::E_STAT_BLAST);
+		}
+	}
+
 	animCounter++;
 }
 void Bullet::UpdateBlast(void)
@@ -204,6 +224,19 @@ void Bullet::BlastOn(Vector2F pos)
 {
 	blastPos = pos;
 	ChangeStatus(Bullet::STATUS::E_STAT_BLAST);
+}
+
+void Bullet::CreateOrbit(Vector2F center, float rad, float speed, int time)
+{
+	centerPos = center;
+	radius = rad;
+	angularSpeed = speed;
+	orbitTime = time;
+	angle = 0.0f;
+	isOrbit = true;
+
+	// 状態を移行
+	ChangeStatus(STATUS::E_STAT_MOVE);
 }
 
 
