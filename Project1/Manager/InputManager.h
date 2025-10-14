@@ -44,6 +44,7 @@ public:
 		DOWN,
 		R_TRIGGER,
 		L_TRIGGER,
+		A,
 		MAX
 	};
 

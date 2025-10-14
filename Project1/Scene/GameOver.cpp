@@ -11,7 +11,7 @@ GameOverScene::~GameOverScene(void)
 // 初期化処理(最初の１回のみ実行)
 bool GameOverScene::SystemInit(void)
 {
-	gameoverImage = LoadGraph("image/Gameover.png");
+	gameoverImage = LoadGraph((Application::PATH_SCENE+"Gameover.png").c_str());
 	if (gameoverImage == -1)return false;
 	return true;
 }
@@ -40,6 +40,8 @@ void GameOverScene::Draw(void)
 
 	DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "ゲームオーバー",
 		dx, dy, dx, dy);
+
+	DrawString(Application::SCREEN_SIZE_WID / 2 - 75, Application::SCREEN_SIZE_HIG / 2 + 240, "Press Space to Title", GetColor(255, 255, 255));
 }
 // 解放処理(最後の１回のみ実行)
 bool GameOverScene::Release(void)

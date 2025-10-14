@@ -6,8 +6,8 @@
 class GameOverScene
 {
 public:
-	static constexpr int GAMEOVER_SIZE_WID = 457; // ゲームオーバー画像の横サイズ
-	static constexpr int GAMEOVER_SIZE_HIG = 81; // ゲームオーバー画像の縦サイズ
+	static constexpr int GAMEOVER_SIZE_WID = 800; // ゲームオーバー画像の横サイズ
+	static constexpr int GAMEOVER_SIZE_HIG = 600; // ゲームオーバー画像の縦サイズ
 
 	GameOverScene(void);
 	~GameOverScene(void);

@@ -27,7 +27,7 @@ bool Bullet::SystemInit(void)
 	img = LoadGraph((Application::PATH_OBJECT + "weapon/sword.png").c_str());
 	if (img == -1) return false; // 読み込み失敗チェック
 
-	int err = LoadDivGraph("image/Blast.png", BLAST_ANIM_MAX, BLAST_ANIM_XNUM, BLAST_ANIM_YNUM,
+	int err = LoadDivGraph(((Application::PATH_OBJECT+"weapon/Blast.png").c_str()), BLAST_ANIM_MAX, BLAST_ANIM_XNUM, BLAST_ANIM_YNUM,
 		BLAST_SIZE_WID, BLAST_SIZE_HIG, blastImage);
 	if (err == -1)return false;
 	return true;

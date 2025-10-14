@@ -42,6 +42,8 @@ void TitleScene::Draw(void)
 	int dx = (Application::SCREEN_SIZE_WID - TITLE_SIZE_WID) / 2;
 	int dy = (Application::SCREEN_SIZE_HIG - TITLE_SIZE_HIG) / 2;
 	DrawGraph(dx, dy, bgImage, true);
+
+	DrawString(Application::SCREEN_SIZE_WID / 2 - 75, Application::SCREEN_SIZE_HIG / 2 + 240, "Press Space to Start", GetColor(255, 255, 255));
 }
 
 bool TitleScene::Release(void)

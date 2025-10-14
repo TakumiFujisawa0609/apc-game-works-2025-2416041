@@ -3,6 +3,7 @@
 #include "../Application.h"
 #include "../Scene/SceneBase.h"
 #include "Bullet.h"
+#include "../Manager/InputManager.h"
 Player::Player(GameScene* gs)
 {
 	bullet = new Bullet(gs);
@@ -48,39 +49,74 @@ void Player::GameInit(void)
 // 更新処理
 void Player::Update(void)
 {
-	animCounter++;
-	if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 10)animCounter = 0;
-	if (CheckHitKey(KEY_INPUT_W)) {
-		playerPos.y -= MOVE_SPEED;
-		if (playerPos.y < (PLAYER_HIG / 2))playerPos.y = PLAYER_HIG / 2;
-		playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_UP);
-	}
-	if (CheckHitKey(KEY_INPUT_S)) {
-		playerPos.y += MOVE_SPEED;
-		if (playerPos.y >= (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2) {
-			playerPos.y = (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2;
-		}
-		playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_DOWN);
-	}
-	if (CheckHitKey(KEY_INPUT_A)) {
-		playerPos.x -= MOVE_SPEED;
-		if (playerPos.x < (PLAYER_WID / 2))playerPos.x = PLAYER_WID / 2;
-		playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_LEFT);
-	}
-	if (CheckHitKey(KEY_INPUT_D)) {
-		playerPos.x += MOVE_SPEED;
-		if (playerPos.x >= (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2) {
-			playerPos.x = (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2;
-		}
-		playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_RIGHT);
-	}
-	// 攻撃ボタンが押されたら
-	if (CheckHitKey(KEY_INPUT_Z))
-	{
-		// 弾を生成
-		bullet->CreateOrbit(GetPosition(), 50.0f, 0.1f, 120);
-	}
-	bullet->Update();
+    animCounter++;
+    if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 10) animCounter = 0;
+
+    float moveX = 0.0f;
+    float moveY = 0.0f;
+
+    // -----------------------------
+    // キーボード入力
+    if (CheckHitKey(KEY_INPUT_W)) moveY -= MOVE_SPEED;
+    if (CheckHitKey(KEY_INPUT_S)) moveY += MOVE_SPEED;
+    if (CheckHitKey(KEY_INPUT_A)) moveX -= MOVE_SPEED;
+    if (CheckHitKey(KEY_INPUT_D)) moveX += MOVE_SPEED;
+
+    // -----------------------------
+    // ゲームパッド入力（PAD1固定）
+    auto& pad = InputManager::GetInstance();
+    auto padState = pad.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+    // アナログスティック
+    moveX += (padState.AKeyLX / 32768.0f) * MOVE_SPEED;
+    moveY += (padState.AKeyLY / 32768.0f) * MOVE_SPEED;
+
+    // 方向ボタン（優先度高）
+    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP)) moveY = -MOVE_SPEED;
+    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) moveY = MOVE_SPEED;
+    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT)) moveX = -MOVE_SPEED;
+    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) moveX = MOVE_SPEED;
+
+    // -----------------------------
+    // 移動適用
+    playerPos.x += moveX;
+    playerPos.y += moveY;
+
+    // 画面端補正（ワールド座標）
+    if (playerPos.x < PLAYER_WID / 2) playerPos.x = PLAYER_WID / 2;
+    if (playerPos.x > (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2)
+        playerPos.x = (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2;
+
+    if (playerPos.y < PLAYER_HIG / 2) playerPos.y = PLAYER_HIG / 2;
+    if (playerPos.y > (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2)
+        playerPos.y = (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2;
+
+    // -----------------------------
+    // 向き設定（移動方向優先）
+    if (moveX < 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_LEFT);
+    else if (moveX > 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_RIGHT);
+    if (moveY < 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_UP);
+    else if (moveY > 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_DOWN);
+
+    // -----------------------------
+    // 攻撃ボタン
+    static bool zPressed = false; // 押しっぱなし防止
+    if (CheckHitKey(KEY_INPUT_Z) || pad.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::A)) {
+        if (!zPressed && bullet->IsEnableCreate()) {
+            float orbitRadius = 60.0f;
+            float orbitSpeed = 0.2f;
+            int orbitTime = 180;
+            bullet->CreateOrbit(Vector2F((float)playerPos.x, (float)playerPos.y),
+                orbitRadius, orbitSpeed, orbitTime);
+            zPressed = true;
+        }
+    }
+    else {
+        zPressed = false;
+    }
+
+    // 弾の更新
+    bullet->Update();
 }
 // 描画処理
 void Player::Draw(void)
