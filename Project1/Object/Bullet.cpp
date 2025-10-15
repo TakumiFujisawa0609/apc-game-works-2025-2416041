@@ -24,7 +24,7 @@ Bullet::~Bullet(void)
 // 初期化処理(最初の１回のみ実行)
 bool Bullet::SystemInit(void)
 {
-	img = LoadGraph((Application::PATH_OBJECT + "weapon/sword.png").c_str());
+	img = LoadGraph((Application::PATH_WEAPON + "sword.png").c_str());
 	if (img == -1) return false; // 読み込み失敗チェック
 
 	int err = LoadDivGraph(((Application::PATH_OBJECT+"weapon/Blast.png").c_str()), BLAST_ANIM_MAX, BLAST_ANIM_XNUM, BLAST_ANIM_YNUM,
@@ -61,34 +61,34 @@ void Bullet::Update(void)
 // 弾の状態毎の更新処理
 void Bullet::UpdateMove(void)
 {
-	if (isOrbit)
+	if (bulletType == BulletType::ORBIT && isOrbit)
 	{
-		// 円運動
+		// プレイヤー座標を中心に追従
+		Vector2 pPos = gInst->GetLpPlayer()->GetPlayerPos();
+		centerPos.x = static_cast<float>(pPos.x);
+		centerPos.y = static_cast<float>(pPos.y);
+
+		// 角度を更新
 		angle += angularSpeed;
 		bPos.x = centerPos.x + cosf(angle) * radius;
 		bPos.y = centerPos.y + sinf(angle) * radius;
 
-		// 生存時間管理
 		orbitTime--;
 		if (orbitTime <= 0)
 		{
 			isOrbit = false;
-			blastPos = bPos;
-			ChangeStatus(STATUS::E_STAT_BLAST);
+			BlastOn(bPos); // 生存時間終了で爆発
 		}
 	}
 	else
 	{
-		// 通常の直線移動
-		bPos.x += bVec.x * MOVE_SPEED;
-		bPos.y += bVec.y * MOVE_SPEED;
+		// 通常弾の移動
+		bPos.x += bVec.x * 10.0f; // 速度
+		bPos.y += bVec.y * 10.0f;
 
 		aliveCounter--;
-		if (aliveCounter < 0)
-		{
-			blastPos = bPos;
-			ChangeStatus(STATUS::E_STAT_BLAST);
-		}
+		if (aliveCounter <= 0)
+			BlastOn(bPos);
 	}
 
 	animCounter++;
@@ -185,6 +185,9 @@ void Bullet::Create(Vector2F pos, AsoUtility::DIRECTION dir)
 		bVec = { 1.0f, 0.0f };
 		break;
 	}
+
+	
+
 	// 状態を遷移させる
 	ChangeStatus(STATUS::E_STAT_MOVE);
 }
@@ -234,9 +237,13 @@ void Bullet::CreateOrbit(Vector2F center, float rad, float speed, int time)
 	orbitTime = time;
 	angle = 0.0f;
 	isOrbit = true;
+	bulletType = BulletType::ORBIT;
 
-	// 状態を移行
+	bPos.x = center.x + cosf(angle) * radius;
+	bPos.y = center.y + sinf(angle) * radius;
+
 	ChangeStatus(STATUS::E_STAT_MOVE);
+
 }
 
 

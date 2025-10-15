@@ -24,6 +24,7 @@ public:
 	//-------------------------------------------
 	static const std::string PATH_DATA;
 	static const std::string PATH_OBJECT;
+	static const std::string PATH_WEAPON;
 	static const std::string PATH_SCENE;
 	static const std::string PATH_STAGE;
 	static const std::string PATH_UI;

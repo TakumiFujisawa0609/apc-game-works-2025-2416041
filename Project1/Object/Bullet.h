@@ -3,7 +3,10 @@
 #include "../Common/Vector2F.h"
 #include "../Common/AsoUtility.h"
 #include "../Object/Player.h"
+
 class GameScene;
+class player;
+
 class Bullet
 {
 public:
@@ -31,6 +34,11 @@ public:
 		
 	};
 
+	enum class BulletType {
+		NORMAL,
+		ORBIT,
+	};
+
 	Bullet(GameScene* gs);
 	~Bullet(void);
 	bool SystemInit(void); // 初期化処理(最初の１回のみ実行)
@@ -50,17 +58,28 @@ public:
 	// 爆発表示開始
 	void BlastOn(Vector2F pos);
 	void CreateOrbit(Vector2F center, float rad, float speed, int time);
+
+	// 円運動用
+	bool isOrbit = false;         // 円運動中かどうか
+	Vector2F centerPos;           // 回る中心座標（プレイヤーの座標）
+	float radius = 50.0f;         // 回る半径
+	float angle = 0.0f;           // 現在の角度
+	float angularSpeed = 0.1f;    // 回転速度（ラジアン/frame）
+	int orbitTime = 120;           // 回る時間（フレーム）
+
+	BulletType bulletType = BulletType::NORMAL;
+
+	Vector2F bPos; // 弾の座標
+	Vector2F bVec; // 弾の移動方向のベクトル(単位ベクトル)
 	
 private:
 	GameScene* gInst; // ゲームシーンクラスのインスタンスのポインタ
+	Player* player; // プレイヤークラスのインスタンスのポインタ
 
 	int img; // 弾の画像のハンドル番号テーブル
 	int blastImage[BLAST_ANIM_MAX]; // 爆発画像のハンドル番号テーブル
 
 	STATUS bNowStat; // 弾の状態
-
-	Vector2F bPos; // 弾の座標
-	Vector2F bVec; // 弾の移動方向のベクトル(単位ベクトル)
 
 	int bDir; // 弾の移動方向
 	int aliveCounter; // 弾の生存時間のカウンター
@@ -80,13 +99,7 @@ private:
 	// 状態を遷移させる
 	void ChangeStatus(STATUS stat);
 
-	// 円運動用
-	bool isOrbit = false;         // 円運動中かどうか
-	Vector2F centerPos;           // 回る中心座標（プレイヤーの座標）
-	float radius = 50.0f;         // 回る半径
-	float angle = 0.0f;           // 現在の角度
-	float angularSpeed = 0.1f;    // 回転速度（ラジアン/frame）
-	int orbitTime = 120;           // 回る時間（フレーム）
+	
 };
 
 

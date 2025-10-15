@@ -98,22 +98,6 @@ void Player::Update(void)
     if (moveY < 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_UP);
     else if (moveY > 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_DOWN);
 
-    // -----------------------------
-    // UŒ‚ƒ{ƒ^ƒ“
-    static bool zPressed = false; // ‰Ÿ‚µ‚Á‚Ï‚È‚µ–hŽ~
-    if (CheckHitKey(KEY_INPUT_Z) || pad.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::A)) {
-        if (!zPressed && bullet->IsEnableCreate()) {
-            float orbitRadius = 60.0f;
-            float orbitSpeed = 0.2f;
-            int orbitTime = 180;
-            bullet->CreateOrbit(Vector2F((float)playerPos.x, (float)playerPos.y),
-                orbitRadius, orbitSpeed, orbitTime);
-            zPressed = true;
-        }
-    }
-    else {
-        zPressed = false;
-    }
 
     // ’e‚ÌXV
     bullet->Update();

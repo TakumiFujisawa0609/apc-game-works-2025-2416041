@@ -2,9 +2,11 @@
 #include <DxLib.h>
 #include <time.h>
 #include "Manager/SceneManager.h"
+#include "Manager/InputManager.h"
 
 const std::string Application::PATH_DATA = "Data/";
 const std::string Application::PATH_OBJECT = PATH_DATA + "object/";
+const std::string Application::PATH_WEAPON = PATH_OBJECT + "weapon/";
 const std::string Application::PATH_SCENE = PATH_DATA + "Scene/";
 const std::string Application::PATH_STAGE = PATH_DATA + "Stage/";
 const std::string Application::PATH_UI = PATH_DATA + "UI/";
@@ -40,6 +42,9 @@ bool Application::SystemInit(void)
 	// 乱数の初期化
 	SRand((unsigned int)time(NULL));
 
+	InputManager::CreateInstance();
+	InputManager::GetInstance().Init();
+
 	// インスタンスの生成
 	sceneMana = new SceneManager();
 	if (sceneMana == nullptr)return false;
@@ -61,6 +66,7 @@ void Application::Run(void)
 // 更新
 void Application::Update(void)
 {
+	InputManager::GetInstance().Update(); // 入力情報の更新
 	sceneMana->Update();
 }
 // 描画
@@ -77,6 +83,7 @@ void Application::Draw(void)
 // 解放処理(最後の１回のみ実行)
 bool Application::Release(void)
 {
+	InputManager::GetInstance().Destroy();
 	sceneMana->Release();
 
 	delete sceneMana;
