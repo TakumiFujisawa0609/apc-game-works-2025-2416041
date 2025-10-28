@@ -4,11 +4,15 @@
 #include "SceneBase.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
+
 #include "../Object/Player.h"
 #include "../Object/Bullet.h"
-#include "../Object/Enemy.h"
-#include "../Object/Enemynormal.h"
+#include "../Object/Enemy/Enemy.h"
+#include "../Object/Enemy/Enemynormal.h"
+#include "../Object/Enemy/EnemySkeleton.h"
+
 #include "../Manager/InputManager.h"
+
 //#include "EnemyDragon.h"
 //#include "EnemyFly.h"
 //#include "EnemyFire.h"
@@ -66,7 +70,7 @@ void GameScene::GameInit(void)
 
 	//制限時間タイマー初期化
 	startTime = GetNowCount();
-	limitTime = 90000; // 30秒耐久でクリア
+	limitTime = 30000; // 30秒耐久でクリア
 	isClear = false;
 }
 
@@ -145,6 +149,9 @@ void GameScene::Update(void)
 		switch (rType) {
 		case Enemy::ENEMY_TYPE::E_TYPE_NORMAL:
 		e = new Enemynormal();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_Skeleton:
+			e = new EnemySkeleton();
 			break;
 		//case EnemyBase::ENEMY_TYPE::E_TYPE_FLY:
 		//	e = new EnemyFly();

@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include "../Common/Vector2.h"
-#include "../Common/Vector2F.h"
-#include "../Common/AsoUtility.h"
+#include "../../Common/Vector2.h"
+#include "../../Common/Vector2F.h"
+#include "../../Common/AsoUtility.h"
 class GameScene;
 class Enemy
 {
@@ -10,7 +10,7 @@ public:
 	enum class ENEMY_TYPE
 	{
 		E_TYPE_NORMAL,
-		E_TYPE_FLY,
+		E_TYPE_Skeleton,
 		E_TYPE_FIRE,
 		E_TYPE_LIZARD_SMALL,
 		E_TYPE_LIZARD_BIG,

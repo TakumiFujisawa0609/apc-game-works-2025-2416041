@@ -1,7 +1,7 @@
 #include <DxLib.h>
 #include "Enemy.h"
-#include "../Scene/Stage/StageBase.h"
-#include "Player.h"
+#include "../../Scene/Stage/StageBase.h"
+#include "../Player.h"
 Enemy::Enemy(void)
 {
 }

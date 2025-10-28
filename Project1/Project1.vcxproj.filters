@@ -51,7 +51,7 @@
     <ClCompile Include="Object\Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Object\Enemy.cpp">
+    <ClCompile Include="Object\Enemy\Enemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Stage\Stage_1.cpp">
@@ -69,7 +69,10 @@
     <ClCompile Include="Scene\Stage\StageBase.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Object\Enemynormal.cpp">
+    <ClCompile Include="Object\Enemy\Enemynormal.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Enemy\EnemySkeleton.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,7 +113,7 @@
     <ClInclude Include="Object\Player.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Object\Enemy.h">
+    <ClInclude Include="Object\Enemy\Enemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Stage\Stage_1.h">
@@ -131,7 +134,10 @@
     <ClInclude Include="Scene\Stage\StageBase.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Object\Enemynormal.h">
+    <ClInclude Include="Object\Enemy\Enemynormal.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Enemy\EnemySkeleton.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
