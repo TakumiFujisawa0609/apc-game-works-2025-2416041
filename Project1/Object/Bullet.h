@@ -59,6 +59,8 @@ public:
 	void BlastOn(Vector2F pos);
 	void CreateOrbit(Vector2F center, float rad, float speed, int time);
 
+
+
 	// 円運動用
 	bool isOrbit = false;         // 円運動中かどうか
 	Vector2F centerPos;           // 回る中心座標（プレイヤーの座標）

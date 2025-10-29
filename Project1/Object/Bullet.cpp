@@ -4,7 +4,7 @@
 #include "../Scene/Stage/StageBase.h"
 #include "Player.h"
 #include "../Application.h"
-#include "../Object/Enemy.h"
+#include "../Object/Enemy/Enemy.h"
 /*
  *----------------------------------------------------
  * コンストラクタ
