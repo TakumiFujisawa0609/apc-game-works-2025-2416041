@@ -13,6 +13,7 @@ public:
 		E_TYPE_Skeleton,
 		E_TYPE_EYE,
 		E_TYPE_Mushroom,
+		E_TYPE_Goblin,
 
 		E_TYPE_MAX,
 	};

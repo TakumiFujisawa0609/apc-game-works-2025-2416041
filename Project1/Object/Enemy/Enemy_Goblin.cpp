@@ -3,10 +3,10 @@
 void Enemy_Goblin::SetEnemyParam(void)
 {
 	// 敵の画像ファイル名
-	imgFName += "Goblin_Run.png";
+	imgFName += "GoblinRun.png";
 	// 敵の画像サイズ
-	size = { 80, 80 };
+	size = { 122, 39 };
 	// 敵の移動速度
-	speed = 3.0f;
-	hp = hpMax = 8;
+	speed = 4.0f;
+	hp = hpMax = 1;
 }

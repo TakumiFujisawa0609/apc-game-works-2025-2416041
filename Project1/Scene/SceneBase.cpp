@@ -12,6 +12,7 @@
 #include "../Object/Enemy/EnemySkeleton.h"
 #include "../Object/Enemy/Enemyeye.h"
 #include "../Object/Enemy/EnemyMushroom.h"
+#include "../Object/Enemy/Enemy_Goblin.h"
 
 #include "../Manager/InputManager.h"
 
@@ -160,6 +161,9 @@ void GameScene::Update(void)
 			break;
 		case Enemy::ENEMY_TYPE::E_TYPE_Mushroom:
 		e = new EnemyMushroom();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_Goblin:
+		e = new Enemy_Goblin();
 			break;
 		}
 
