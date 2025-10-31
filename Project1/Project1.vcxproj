@@ -133,6 +133,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Object\Enemy\Enemy_Goblin.cpp" />
+    <ClCompile Include="Object\Enemy\EnemyMushroom.cpp" />
+    <ClCompile Include="Object\Enemy\Enemyeye.cpp" />
     <ClCompile Include="Object\Enemy\EnemySkeleton.cpp" />
     <ClCompile Include="Object\Enemy\Enemynormal.cpp" />
     <ClCompile Include="Object\Bullet.cpp" />
@@ -155,6 +158,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Object\Enemy\Enemy_Goblin.h" />
+    <ClInclude Include="Object\Enemy\EnemyMushroom.h" />
+    <ClInclude Include="Object\Enemy\Enemyeye.h" />
     <ClInclude Include="Object\Enemy\EnemySkeleton.h" />
     <ClInclude Include="Object\Enemy\Enemynormal.h" />
     <ClInclude Include="Object\Bullet.h" />

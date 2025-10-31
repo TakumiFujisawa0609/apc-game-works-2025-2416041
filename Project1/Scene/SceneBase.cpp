@@ -10,6 +10,8 @@
 #include "../Object/Enemy/Enemy.h"
 #include "../Object/Enemy/Enemynormal.h"
 #include "../Object/Enemy/EnemySkeleton.h"
+#include "../Object/Enemy/Enemyeye.h"
+#include "../Object/Enemy/EnemyMushroom.h"
 
 #include "../Manager/InputManager.h"
 
@@ -151,26 +153,14 @@ void GameScene::Update(void)
 		e = new Enemynormal();
 			break;
 		case Enemy::ENEMY_TYPE::E_TYPE_Skeleton:
-			e = new EnemySkeleton();
+		e = new EnemySkeleton();
 			break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_FLY:
-		//	e = new EnemyFly();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_FIRE:
-		//	e = new EnemyFire();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_LIZARD_SMALL:
-		//	e = new EnemyLizardSmall();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_LIZARD_BIG:
-		//	e = new EnemyLizardBig();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_DRAGON:
-		//	e = new EnemyDragon();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS:
-		//	e = new EnemyBoss();
-		//	break;
+		case Enemy::ENEMY_TYPE::E_TYPE_EYE:
+		e = new Enemyeye();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_Mushroom:
+		e = new EnemyMushroom();
+			break;
 		}
 
 		if (e != nullptr) {

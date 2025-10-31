@@ -11,11 +11,8 @@ public:
 	{
 		E_TYPE_NORMAL,
 		E_TYPE_Skeleton,
-		E_TYPE_FIRE,
-		E_TYPE_LIZARD_SMALL,
-		E_TYPE_LIZARD_BIG,
-		E_TYPE_DRAGON,
-		E_TYPE_BOSS,
+		E_TYPE_EYE,
+		E_TYPE_Mushroom,
 
 		E_TYPE_MAX,
 	};
