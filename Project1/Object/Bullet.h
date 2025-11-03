@@ -90,6 +90,8 @@ private:
 
 	Vector2F blastPos; // 爆発の座標
 
+	unsigned int frame = 0;//フレーム管理用
+
 	// 弾の状態毎の更新処理
 	void UpdateMove(void);
 	void UpdateBlast(void);
