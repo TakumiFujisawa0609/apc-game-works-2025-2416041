@@ -1,0 +1,9 @@
+diff a/Project1/Project1.vcxproj b/Project1/Project1.vcxproj	(rejected hunks)
+@@ -133,6 +133,7 @@
+   </ItemDefinitionGroup>
+   <ItemGroup>
+     <ClCompile Include="Application.cpp" />
++    <ClCompile Include="Manager\BulletManager.cpp" />
+     <ClCompile Include="Object\Enemy\Enemy_Goblin.cpp" />
+     <ClCompile Include="Object\Enemy\EnemyMushroom.cpp" />
+     <ClCompile Include="Object\Enemy\Enemyeye.cpp" />
