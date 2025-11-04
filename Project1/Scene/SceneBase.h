@@ -13,6 +13,16 @@ class Bullet;
 class GameScene
 {
 public:
+
+
+    //敵の弾の構造体
+    struct B{
+        Vector2 pos;//座標
+        Vector2 vel;//速度
+        bool isActive = false;//生きてるか～？
+        Vector2 accel = { 0, 0 }; //加速度（必要なら使う）
+    };
+
     // スクロールを発生させる範囲
     static constexpr int SCROLL_AREA_WID = 150;
     static constexpr int SCROLL_AREA_HIG = 100;
@@ -43,6 +53,8 @@ private:
     // 複数に変更！
     std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
 
+    B bullet_magazine[256] = {};
+
     // 敵関連
     std::vector<Enemy*> enemys;   // 複数の敵を動的に管理
     std::list<Enemy*> enemysSortTbl; // 敵の描画順ソート用
@@ -55,6 +67,8 @@ private:
     int startTime;      // 開始時間（ミリ秒）
     int limitTime;      // 制限時間（ミリ秒）
     bool isClear;       // クリア判定
+
+    unsigned int frame;//フレーム管理用
 
     // シーン遷移ID
     E_SCENE_ID nextSceneID;

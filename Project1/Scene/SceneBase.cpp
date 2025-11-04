@@ -71,6 +71,8 @@ void GameScene::GameInit(void)
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
 
+	frame = 0;
+
 	//§ŒÀŠÔƒ^ƒCƒ}[‰Šú‰»
 	startTime = GetNowCount();
 	limitTime = 30000; // 30•b‘Ï‹v‚ÅƒNƒŠƒA
@@ -86,31 +88,118 @@ void GameScene::Update(void)
 
 	static int shotTimer = 0;
 	const int SHOT_INTERVAL = 30;
+	const int bullet_interval = 12; //’e”­ËŠÔŠu
 
-	// ’e‚Ì”­Ë
-	shotTimer++;
-	if (shotTimer >= SHOT_INTERVAL)
+	if (frame < SHOT_INTERVAL)
 	{
-		shotTimer = 0;
-		Bullet* newBullet = new Bullet(this);
-		newBullet->SystemInit();
-		newBullet->GameInit();
-
-		Vector2 pos = player->GetPlayerPos();
-		Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
-		newBullet->Create(posF, player->GetPlayerDir());
-
-		bullets.push_back(newBullet);
+		//’e”­Ë(12ƒtƒŒ[ƒ€‚²‚Æ‚É’e‚ğ”­Ëj
+		if (frame % bullet_interval == 0) {
+			for (auto& b : bullet_magazine/*’e‘q*/) {
+				if (!b.isActive) {	//”­Ë
+					b.pos = oldPos;		//”­ËˆÊ’u
+					b.vel = (playerpos - enemypos).Normalized() * Bullet::MOVE_SPEED;//“G‚ÌÀ•W
+					b.isActive = true;		//”­Ëˆ—
+					break;
+				}
+			}
+		}
 	}
+	else if (frame < SHOT_INTERVAL * 3) {
+		//•úËó’e
+		constexpr float radiality = 12.0f; //©‹@‘_‚¢’e‚ÌŠp“x‚Ì‚Î‚ç‚Â‚«
+		constexpr float diff_angle = 2.0f * DX_PI_F / radiality; //Šp“x‚Ì‚Î‚ç‚Â‚«
+		if (frame % bullet_interval == 0) {
+			int cnt = 0;
+			float angle = 0.0f; //Šp“x
+			for (auto& b : bullet_magazine/*’e‘q*/) {
+				if (!b.isActive) {	//”­Ë
+					b.pos = oldPos;		//”­ËˆÊ’u
+					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.vel *= Bullet::MOVE_SPEED; //’e‚Ì‘¬“x‚ğİ’è
+					b.isActive = true;		//”­Ëˆ—
+					cnt++;
+					angle += diff_angle; //Šp“x‚ğ‘‚â‚·
+				}
+				if (cnt >= radiality)
+				{
+					break; //•úËó’e‚ÍradialityŒÂ”­Ë‚·‚é
+				}
+			}
+		}
+	}
+	else if (frame < SHOT_INTERVAL * 4) {
+		if (frame % bullet_interval == 0) {
+			//nwan’e
+			//©‹@‘_‚¢’e
+			constexpr int way_num = 9; //nwan’e‚Ì•ûŒü”
+			constexpr float way_angle = 2.0f * DX_PI_F / 36.f; //nwan’e‚ÌŠp“x‚Ì‚Î‚ç‚Â‚«
+			int count = 0;
+			Vector2 dir = playerpos - enemypos; //©‹@‚Ì•ûŒü‚ğŒvZ
+			float angle = atan2(dir.y, dir.x);
+			angle -= way_angle * (way_num - 1) / 2.0f; //Šp“x‚ğŒvZ
 
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
-	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
-		Vector2 pos = player->GetPlayerPos();
-		b->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
-		bullets.push_back(b);
+			for (auto& b : bullet_magazine/*’e‘q*/) {
+				if (!b.isActive) {	//”­Ë
+					b.pos = enemypos;		//”­ËˆÊ’u
+					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.vel *= Bullet::MOVE_SPEED; //’e‚Ì‘¬“x‚ğİ’è
+					b.isActive = true;		//”­Ëˆ—
+					++count;
+					angle += way_angle;
+				}
+				if (count == way_num) {
+					break;
+				}
+			}
+		}
+	}
+	else if (frame < SHOT_INTERVAL * 5) {
+		//‚Î‚ç‚Ü‚«’e
+		constexpr float radiality = 12.0f; //©‹@‘_‚¢’e‚ÌŠp“x‚Ì‚Î‚ç‚Â‚«
+		constexpr float diff_angle = 2.0f * DX_PI_F / radiality; //Šp“x‚Ì‚Î‚ç‚Â‚«
+		if (frame % bullet_interval == 0) {
+			int cnt = 0;
+			float angle = GetRadianFromDegreen(GetRand(20) - 10);
+			for (auto& b : bullet_magazine/*’e‘q*/) {
+				if (!b.isActive) {	//”­Ë
+					b.pos = enemypos;		//”­ËˆÊ’u
+					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.vel *= (Bullet::MOVE_SPEED + GetRand(6) - 3); //’e‚Ì‘¬“x‚ğİ’è
+					b.isActive = true;		//”­Ëˆ—
+					++cnt;
+					angle += diff_angle + GetRadianFromDegreen(GetRand(20) - 10); //Šp“x‚ğ‘‚â‚·
+				}
+				if (cnt >= radiality)
+				{
+					break; //•úËó’e‚ÍradialityŒÂ”­Ë‚·‚é
+				}
+			}
+		}
+	}
+	else {
+		oldPos.y = 125;
+		//•úËó’e
+		constexpr float radiality = 12.0f; //©‹@‘_‚¢’e‚ÌŠp“x‚Ì‚Î‚ç‚Â‚«
+		constexpr float diff_angle = 2.0f * DX_PI_F / radiality; //Šp“x‚Ì‚Î‚ç‚Â‚«
+		if (frame % bullet_interval == 0) {
+			int cnt = 0;
+			float angle = 0.0f; //Šp“x
+			for (auto& b : bullet_magazine/*’e‘q*/) {
+				if (!b.isActive) {	//”­Ë
+					b.pos = enemypos;		//”­ËˆÊ’u
+					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.vel *= Bullet::MOVE_SPEED; //’e‚Ì‘¬“x‚ğİ’è
+					b.accel = { 0.0,0.1f };
+					b.isActive = true;		//”­Ëˆ—
+					cnt++;
+					angle += diff_angle; //Šp“x‚ğ‘‚â‚·
+				}
+				if (cnt >= radiality)
+				{
+					break; //•úËó’e‚ÍradialityŒÂ”­Ë‚·‚é
+				}
+			}
+		}
 	}
 
 

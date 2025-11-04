@@ -34,6 +34,8 @@ public:
 		
 	};
 
+	
+
 	enum class BulletType {
 		NORMAL,
 		ORBIT,
