@@ -83,6 +83,8 @@ void GameScene::GameInit(void)
 void GameScene::Update(void)
 {
 	Vector2 oldPos = player->GetPlayerPos(); // 移動前のプレイヤーの位置
+      int ePos = enCounter; //敵の位置
+
 	stage->Update();
 	player->Update();
 
@@ -97,7 +99,7 @@ void GameScene::Update(void)
 			for (auto& b : bullet_magazine/*弾倉*/) {
 				if (!b.isActive) {	//発射
 					b.pos = oldPos;		//発射位置
-					b.vel = (playerpos - enemypos).Normalized() * Bullet::MOVE_SPEED;//敵の座標
+					b.vel = oldPos;//敵の座標
 					b.isActive = true;		//発射処理
 					break;
 				}
@@ -134,7 +136,7 @@ void GameScene::Update(void)
 			constexpr int way_num = 9; //nwan弾の方向数
 			constexpr float way_angle = 2.0f * DX_PI_F / 36.f; //nwan弾の角度のばらつき
 			int count = 0;
-			Vector2 dir = playerpos - enemypos; //自機の方向を計算
+			Vector2 dir = oldPos; //自機の方向を計算
 			float angle = atan2(dir.y, dir.x);
 			angle -= way_angle * (way_num - 1) / 2.0f; //角度を計算
 
@@ -142,7 +144,7 @@ void GameScene::Update(void)
 				if (!b.isActive) {	//発射
 					b.pos = enemypos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
-					b.vel *= Bullet::MOVE_SPEED; //弾の速度を設定
+					b.vel = Bullet::MOVE_SPEED; //弾の速度を設定
 					b.isActive = true;		//発射処理
 					++count;
 					angle += way_angle;
@@ -162,7 +164,7 @@ void GameScene::Update(void)
 			float angle = GetRadianFromDegreen(GetRand(20) - 10);
 			for (auto& b : bullet_magazine/*弾倉*/) {
 				if (!b.isActive) {	//発射
-					b.pos = enemypos;		//発射位置
+					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
 					b.vel *= (Bullet::MOVE_SPEED + GetRand(6) - 3); //弾の速度を設定
 					b.isActive = true;		//発射処理
@@ -186,7 +188,7 @@ void GameScene::Update(void)
 			float angle = 0.0f; //角度
 			for (auto& b : bullet_magazine/*弾倉*/) {
 				if (!b.isActive) {	//発射
-					b.pos = enemypos;		//発射位置
+					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
 					b.vel *= Bullet::MOVE_SPEED; //弾の速度を設定
 					b.accel = { 0.0,0.1f };
