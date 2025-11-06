@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <list>
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 #include "../StDefineData.h"
 
 class StageBase;
@@ -14,6 +14,10 @@ class GameScene
 {
 public:
 
+    struct Position2 {
+        int x;
+        int y;
+    };
 
     //敵の弾の構造体
     struct B{
@@ -53,7 +57,9 @@ private:
     // 複数に変更！
     std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
 
-    B bullet_magazine[256] = {};
+	B bullet_magazine[256] = {}; //味方の弾の弾倉
+    float bullet_speed = 5.0f;
+
 
     // 敵関連
     std::vector<Enemy*> enemys;   // 複数の敵を動的に管理
@@ -81,9 +87,7 @@ private:
     void CollisionCheck(void);
     bool CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vector2 centerPos2, Vector2 size2);
     void CreateOrbitRing(int numBullets, float radius, float speed, int lifetime);
-    float GetRadianFromDegreen(float deg) {
-        return (DX_PI_F * deg) / 180.0f;
-    }
+   
 };
 
 

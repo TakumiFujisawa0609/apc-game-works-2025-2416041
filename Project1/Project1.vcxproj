@@ -150,7 +150,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Manager\SceneManager.cpp" />
     <ClCompile Include="Manager\SoundManager.cpp" />
-    <ClCompile Include="Common\Vector2.cpp" />
+    <ClCompile Include="Common\Geometry.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="Scene\Stage\Stage_1.cpp" />
     <ClCompile Include="Common\Vector2F.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="Manager\InputManager.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\SoundManager.h" />
-    <ClInclude Include="Common\Vector2.h" />
+    <ClInclude Include="Common\Geometry.h" />
     <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="Scene\Stage\Stage_1.h" />
     <ClInclude Include="Scene\Stage\StageBase.h" />

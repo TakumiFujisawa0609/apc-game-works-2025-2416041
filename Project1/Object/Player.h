@@ -1,5 +1,5 @@
 #pragma once
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 #include "../Common/AsoUtility.h"
 #include "../Scene/Stage/StageBase.h"
 #include "../Scene/SceneBase.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../Common/Vector2.h"
+#include "../../Common/Geometry.h"
 #include "../../Common/Vector2F.h"
 #include "../../Common/AsoUtility.h"
 class GameScene;

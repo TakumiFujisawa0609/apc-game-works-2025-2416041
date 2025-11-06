@@ -1,5 +1,5 @@
 #pragma once
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 #include "../Common/Vector2F.h"
 #include "../Common/AsoUtility.h"
 #include "../Object/Player.h"
@@ -13,7 +13,6 @@ public:
 	static constexpr int BULLET_SIZE_WID = 60; // 弾の横サイズ
 	static constexpr int BULLET_SIZE_HIG = 40; // 弾の縦サイズ
 	//static constexpr int ANIM_NUMS = 2; // 弾のアニメーション数
-	static constexpr float MOVE_SPEED = 5.0f; // 移動速度
 	static constexpr int ANIM_INTERVAL = 5; // 弾のアニメーションの更新間隔
 	static constexpr int ALIVE_TIME = 30; // 弾の生存時間
 	static constexpr int BLAST_SIZE_WID = 32; // 爆発のサイズ

@@ -1,6 +1,7 @@
 
 // GameScene class
 #include <DxLib.h>
+#include <cmath>
 #include "SceneBase.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
@@ -16,12 +17,17 @@
 
 #include "../Manager/InputManager.h"
 
+
 //#include "EnemyDragon.h"
 //#include "EnemyFly.h"
 //#include "EnemyFire.h"
 //#include "EnemyLizardSmall.h"
 //#include "EnemyLizardBig.h"
 //#include "EnemyBoss.h"
+
+float GetRadianFromDegreen(float deg) {
+	return (DX_PI_F * deg) / 180.0f;
+}
 
 GameScene::GameScene(void)
 {
@@ -117,7 +123,7 @@ void GameScene::Update(void)
 				if (!b.isActive) {	//発射
 					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
-					b.vel *= Bullet::MOVE_SPEED; //弾の速度を設定
+					b.vel *= bullet_speed; //弾の速度を設定
 					b.isActive = true;		//発射処理
 					cnt++;
 					angle += diff_angle; //角度を増やす
@@ -142,9 +148,9 @@ void GameScene::Update(void)
 
 			for (auto& b : bullet_magazine/*弾倉*/) {
 				if (!b.isActive) {	//発射
-					b.pos = enemypos;		//発射位置
+					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
-					b.vel = Bullet::MOVE_SPEED; //弾の速度を設定
+					b.vel *= bullet_speed; //弾の速度を設定
 					b.isActive = true;		//発射処理
 					++count;
 					angle += way_angle;
@@ -166,7 +172,7 @@ void GameScene::Update(void)
 				if (!b.isActive) {	//発射
 					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
-					b.vel *= (Bullet::MOVE_SPEED + GetRand(6) - 3); //弾の速度を設定
+					b.vel *= (bullet_speed + GetRand(6) - 3); //弾の速度を設定
 					b.isActive = true;		//発射処理
 					++cnt;
 					angle += diff_angle + GetRadianFromDegreen(GetRand(20) - 10); //角度を増やす
@@ -190,7 +196,7 @@ void GameScene::Update(void)
 				if (!b.isActive) {	//発射
 					b.pos = oldPos;		//発射位置
 					b.vel = { cosf(angle),sinf(angle) };	//敵の座標
-					b.vel *= Bullet::MOVE_SPEED; //弾の速度を設定
+					b.vel *= bullet_speed; //弾の速度を設定
 					b.accel = { 0.0,0.1f };
 					b.isActive = true;		//発射処理
 					cnt++;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../StDefineData.h"
-#include "../../Common/Vector2.h"
+#include "../../Common/Geometry.h"]
 #include "../../Application.h"
 
 class StageBase
@@ -80,7 +80,7 @@ private:
 	// 地上マップデータ
 	int groundMapDat[MAP_GROUND_NUM_Y][MAP_GROUND_NUM_X];
 
-	Vector2 mapDispStPos; // マップ表示開始座標 
+	Position2 mapDispStPos; // マップ表示開始座標 
 
 	void ClearDispMap(void);
 

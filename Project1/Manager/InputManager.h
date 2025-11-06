@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <Dxlib.h>
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 
 class InputManager
 {
