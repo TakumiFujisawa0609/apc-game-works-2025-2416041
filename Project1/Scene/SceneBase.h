@@ -66,7 +66,7 @@ private:
     bool IsCollisionStage(Vector2 worldPos);
     void CollisionCheck(void);
     bool CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vector2 centerPos2, Vector2 size2);
-    void CreateOrbitRing(int numBullets, float radius, float speed, int lifetime);
+
 };
 
 

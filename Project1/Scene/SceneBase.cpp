@@ -106,6 +106,16 @@ void GameScene::Update(void)
 		bullets.push_back(b);
 	}
 
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1))
+	{
+		Bullet* b = new Bullet(this);
+		b->SystemInit();
+		b->GameInit();
+		Vector2 pos = player->GetPlayerPos();
+		b->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
+		bullets.push_back(b);
+	}
+
 
 	// ’e‚ÌXV
 	for (auto& b : bullets) b->Update();
@@ -500,32 +510,4 @@ bool GameScene::CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vect
 		return true;
 	}
 	return false;
-}
-
-void GameScene::CreateOrbitRing(int numBullets, float radius, float speed, int lifetime)
-{
-	Vector2 playerPos = player->GetPlayerPos();
-	float angleStep = 2.0f * 3.14159265f / numBullets;
-
-	for (int i = 0; i < numBullets; i++)
-	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
-
-		// ‰ŠúŠp“x‚ð‹Ï“™‚ÉU‚è•ª‚¯
-		float angle = i * angleStep;
-		b->angle = angle;
-		b->radius = radius;
-		b->angularSpeed = speed;
-		b->orbitTime = lifetime;
-		b->isOrbit = true;
-		b->bulletType = Bullet::BulletType::ORBIT;
-
-		// ‰ŠúˆÊ’u
-		b->bPos.x = playerPos.x + cosf(angle) * radius;
-		b->bPos.y = playerPos.y + sinf(angle) * radius;
-
-		bullets.push_back(b);
-	}
 }

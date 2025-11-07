@@ -36,7 +36,9 @@ public:
 
 	enum class BulletType {
 		NORMAL,
-		ORBIT,
+		ORBIT,		// ‰ñ“]
+		RAIN,		// ‰J
+		DEFFUSION,	// •úË
 	};
 
 	Bullet(GameScene* gs);
@@ -59,8 +61,12 @@ public:
 	void BlastOn(Vector2F pos);
 	void CreateOrbit(Vector2F center, float rad, float speed, int time);
 
+	void CreateRain(Vector2F center, float rad, float speed, int time);
+
 	// ‰~‰^“®—p
 	bool isOrbit = false;         // ‰~‰^“®’†‚©‚Ç‚¤‚©
+
+	bool isRain = false;
 	Vector2F centerPos;           // ‰ñ‚é’†SÀ•WiƒvƒŒƒCƒ„[‚ÌÀ•Wj
 	float radius = 50.0f;         // ‰ñ‚é”¼Œa
 	float angle = 0.0f;           // Œ»İ‚ÌŠp“x

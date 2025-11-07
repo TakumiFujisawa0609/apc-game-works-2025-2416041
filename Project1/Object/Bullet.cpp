@@ -80,6 +80,25 @@ void Bullet::UpdateMove(void)
 			BlastOn(bPos); // 生存時間終了で爆発
 		}
 	}
+	else if (bulletType == BulletType::RAIN && isOrbit)
+	{
+		// プレイヤー座標を中心に追従
+		Vector2 pPos = gInst->GetLpPlayer()->GetPlayerPos();
+		centerPos.x = static_cast<float>(pPos.x);
+		centerPos.y = static_cast<float>(pPos.y);
+
+		// 角度を更新
+		angle += angularSpeed;
+		bPos.x = centerPos.x + cosf(angle) * radius;
+		bPos.y = centerPos.y + sinf(angle) * radius;
+
+		orbitTime--;
+		if (orbitTime <= 0)
+		{
+			isOrbit = false;
+			BlastOn(bPos); // 生存時間終了で爆発
+		}
+	}
 	else
 	{
 		// 通常弾の移動
@@ -87,8 +106,7 @@ void Bullet::UpdateMove(void)
 		bPos.y += bVec.y * 10.0f;
 
 		aliveCounter--;
-		if (aliveCounter <= 0)
-			BlastOn(bPos);
+		if (aliveCounter <= 0) { BlastOn(bPos); }
 	}
 
 	animCounter++;
@@ -246,4 +264,19 @@ void Bullet::CreateOrbit(Vector2F center, float rad, float speed, int time)
 
 }
 
+void Bullet::CreateRain(Vector2F center, float rad, float speed, int time)
+{
+	centerPos = center;
+	radius = rad;
+	angularSpeed = speed;
+	orbitTime = time;
+	angle = 0.0f;
+	isOrbit = true;
+	bulletType = BulletType::RAIN;
 
+	bPos.x = center.x + cosf(-angle) * radius;
+	bPos.y = center.y + sinf(angle) * radius;
+
+	ChangeStatus(STATUS::E_STAT_MOVE);
+
+}
