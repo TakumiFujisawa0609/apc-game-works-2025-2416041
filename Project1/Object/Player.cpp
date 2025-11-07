@@ -1,7 +1,7 @@
 #include <DxLib.h>
 #include "Player.h"
 #include "../Application.h"
-#include "../Scene/SceneBase.h"
+#include "../Scene/GameScene.h"
 #include "Bullet.h"
 #include "../Manager/InputManager.h"
 Player::Player(GameScene* gs)

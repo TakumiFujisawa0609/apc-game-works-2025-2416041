@@ -143,7 +143,7 @@
     <ClCompile Include="Common\Fader.cpp" />
     <ClCompile Include="Object\Enemy\Enemy.cpp" />
     <ClCompile Include="Object\Player.cpp" />
-    <ClCompile Include="Scene\SceneBase.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\GameOver.cpp" />
     <ClCompile Include="Scene\GameClear.cpp" />
     <ClCompile Include="Manager\InputManager.cpp" />
@@ -169,7 +169,7 @@
     <ClInclude Include="Common\Fader.h" />
     <ClInclude Include="Object\Enemy\Enemy.h" />
     <ClInclude Include="Object\Player.h" />
-    <ClInclude Include="Scene\SceneBase.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\GameOver.h" />
     <ClInclude Include="Scene\GameClear.h" />
     <ClInclude Include="Manager\InputManager.h" />

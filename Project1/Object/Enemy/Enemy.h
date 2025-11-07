@@ -7,6 +7,7 @@ class GameScene;
 class Enemy
 {
 public:
+
 	enum class ENEMY_TYPE
 	{
 		E_TYPE_NORMAL,

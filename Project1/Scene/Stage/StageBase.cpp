@@ -49,7 +49,7 @@ void StageBase::Draw(void)
 		if (yy >= DSP_CHIP_NUM_Y)break;
 		for (int xx = 0; xx < dispMapSize.x; xx++) {
 			if (xx >= DSP_CHIP_NUM_X)break;
-			int chip = dispMapDat[mapDispStPos.y + yy][mapDispStPos.x + xx];
+			int chip = dispMapDat[(int)(mapDispStPos.y + yy)][(int)(mapDispStPos.x + xx)];
 			int dx = MAP_CHIP_SIZE_WID * xx;
 			int dy = MAP_CHIP_SIZE_HIG * yy;
 			DrawGraph(dx, dy, imgMapChipArray[chip], true);
@@ -132,7 +132,7 @@ bool StageBase::LoadGroundData(void)
 }
 
 
-int StageBase::GetMapChipNo(Vector2 mPos) { return dispMapDat[mPos.y][mPos.x]; }
+int StageBase::GetMapChipNo(Vector2 mPos) { return dispMapDat[(int)mPos.y][(int)mPos.x]; }
 
 void StageBase::ChangeMap(MAP_TYPE mtype)
 {

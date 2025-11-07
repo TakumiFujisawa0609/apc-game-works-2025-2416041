@@ -2,7 +2,8 @@
 // GameScene class
 #include <DxLib.h>
 #include <cmath>
-#include "SceneBase.h"
+#include <vector>
+#include "GameScene.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
 
@@ -55,7 +56,7 @@ bool GameScene::SystemInit(void)
 	Bullet* tmp = new Bullet(this);
 	if (!tmp->SystemInit()) return false;
 	delete tmp; // ŒÂ•Ê’e‚Í Update() ‚Å¶¬
-	bullets.clear();
+	bullet.clear();
 
 	return true;
 }
@@ -67,12 +68,11 @@ void GameScene::GameInit(void)
 	player->GameInit();
 
 	// ’e‚Ì‰Šú‰»
-	for (auto& b : bullets) { // ‚à‚µŠù‚Éc‚Á‚Ä‚¢‚é’e‚ª‚ ‚ê‚Îíœ
-		b->Release();
-		delete b;
+	for (auto& b : bullet) { // ‚à‚µŠù‚Éc‚Á‚Ä‚¢‚é’e‚ª‚ ‚ê‚Îíœ
+		b.Release();
 	}
 
-	bullets.clear();
+	bullet.clear();
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
@@ -89,7 +89,7 @@ void GameScene::GameInit(void)
 void GameScene::Update(void)
 {
 	Vector2 oldPos = player->GetPlayerPos(); // ˆÚ“®‘O‚ÌƒvƒŒƒCƒ„[‚ÌˆÊ’u
-      int ePos = enCounter; //“G‚ÌˆÊ’u
+     //“G‚ÌˆÊ’u
 
 	stage->Update();
 	player->Update();
@@ -102,10 +102,10 @@ void GameScene::Update(void)
 	{
 		//’e”­Ë(12ƒtƒŒ[ƒ€‚²‚Æ‚É’e‚ğ”­Ëj
 		if (frame % bullet_interval == 0) {
-			for (auto& b : bullet_magazine/*’e‘q*/) {
+			for (auto& b : bullet/*’e‘q*/) {
 				if (!b.isActive) {	//”­Ë
-					b.pos = oldPos;		//”­ËˆÊ’u
-					b.vel = oldPos;//“G‚ÌÀ•W
+					b.bPos;		//”­ËˆÊ’u
+					//“G‚ÌÀ•W
 					b.isActive = true;		//”­Ëˆ—
 					break;
 				}
@@ -119,9 +119,9 @@ void GameScene::Update(void)
 		if (frame % bullet_interval == 0) {
 			int cnt = 0;
 			float angle = 0.0f; //Šp“x
-			for (auto& b : bullet_magazine/*’e‘q*/) {
+			for (auto& b : bullet/*’e‘q*/) {
 				if (!b.isActive) {	//”­Ë
-					b.pos = oldPos;		//”­ËˆÊ’u
+					b.bPos;		//”­ËˆÊ’u
 					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
 					b.vel *= bullet_speed; //’e‚Ì‘¬“x‚ğİ’è
 					b.isActive = true;		//”­Ëˆ—
@@ -145,11 +145,9 @@ void GameScene::Update(void)
 			Vector2 dir = oldPos; //©‹@‚Ì•ûŒü‚ğŒvZ
 			float angle = atan2(dir.y, dir.x);
 			angle -= way_angle * (way_num - 1) / 2.0f; //Šp“x‚ğŒvZ
-
-			for (auto& b : bullet_magazine/*’e‘q*/) {
+			for (auto& b : bullet/*’e‘q*/) {
 				if (!b.isActive) {	//”­Ë
-					b.pos = oldPos;		//”­ËˆÊ’u
-					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.bPos;		//”­ËˆÊ’u
 					b.vel *= bullet_speed; //’e‚Ì‘¬“x‚ğİ’è
 					b.isActive = true;		//”­Ëˆ—
 					++count;
@@ -168,10 +166,9 @@ void GameScene::Update(void)
 		if (frame % bullet_interval == 0) {
 			int cnt = 0;
 			float angle = GetRadianFromDegreen(GetRand(20) - 10);
-			for (auto& b : bullet_magazine/*’e‘q*/) {
+			for (auto& b : bullet/*’e‘q*/) {
 				if (!b.isActive) {	//”­Ë
-					b.pos = oldPos;		//”­ËˆÊ’u
-					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
+					b.bPos;		//”­ËˆÊ’u	//“G‚ÌÀ•W
 					b.vel *= (bullet_speed + GetRand(6) - 3); //’e‚Ì‘¬“x‚ğİ’è
 					b.isActive = true;		//”­Ëˆ—
 					++cnt;
@@ -192,12 +189,11 @@ void GameScene::Update(void)
 		if (frame % bullet_interval == 0) {
 			int cnt = 0;
 			float angle = 0.0f; //Šp“x
-			for (auto& b : bullet_magazine/*’e‘q*/) {
-				if (!b.isActive) {	//”­Ë
-					b.pos = oldPos;		//”­ËˆÊ’u
+			for (auto& b : bullet/*’e‘q*/) {
+				if (b.isActive) {	//”­Ë
+					b.bPos;		//”­ËˆÊ’u
 					b.vel = { cosf(angle),sinf(angle) };	//“G‚ÌÀ•W
 					b.vel *= bullet_speed; //’e‚Ì‘¬“x‚ğİ’è
-					b.accel = { 0.0,0.1f };
 					b.isActive = true;		//”­Ëˆ—
 					cnt++;
 					angle += diff_angle; //Šp“x‚ğ‘‚â‚·
@@ -211,22 +207,26 @@ void GameScene::Update(void)
 	}
 
 
-	// ’e‚ÌXV
-	for (auto& b : bullets) b->Update();
+	//’e‚ÌXV‚¨‚æ‚Ñ•\¦
+	for (auto& b : bullet) {
+		if (!b.isActive) {
+			continue;
+		}
 
-	// I—¹‚µ‚½’e‚ğíœ
-	bullets.erase(
-		std::remove_if(bullets.begin(), bullets.end(),
-			[](Bullet* b) {
-				if (b->IsEnableCreate()) {
-					b->Release();
-					delete b;
-					return true;
-				}
-				return false;
-			}),
-		bullets.end()
-	);
+		b.vel += b.accel;
+		//’e‚ÌŒ»İÀ•W‚É’e‚ÌŒ»İ‘¬“x‚ğ‰ÁZ‚µ‚Ä‚­‚¾‚³‚¢
+		b.bPos.x += b.vel.x;
+		b.bPos.y += b.vel.y;
+		float angle = 0.0f;
+		//’e‚ÌŠp“x‚ğatan2‚ÅŒvZ‚µ‚Ä‚­‚¾‚³‚¢Bangle‚É’l‚ğ“ü‚ê‚é‚ñ‚¾‚æƒIƒD
+		angle = std::atan2(b.vel.y, b.vel.x);
+		
+		//’e‚ğE‚·
+		if (b.bPos.x + 16 < 0 || b.bPos.x - 16 > 640 ||
+			b.bPos.y + 24 < 0 || b.bPos.y - 24 > 480) {
+		}
+
+	}
 
 
 	// “G‚ÌXV
@@ -345,12 +345,14 @@ void GameScene::Draw(void)
 {
 	stage->Draw();
 	player->Draw();
+
 	// “G‚Ì•`‰æ
 	size_t size = enemys.size();
 	for (int ii = 0; ii < size; ii++) {
 		enemys[ii]->Draw();
 	}
-	for (auto& b : bullets) b->Draw();
+
+	for (auto& b : bullet) b.Draw();
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	int php = player->GetHp();
@@ -380,11 +382,10 @@ bool GameScene::Release(void)
 	// “G‚Ì‰ğ•ú
 	EraseEnemys();
 	// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì‰ğ•ú
-	for (auto& b : bullets) {
-		b->Release();
-		delete b;
+	for (auto& b : bullet) {
+		b.Release();
 	}
-	bullets.clear();
+	bullet.clear();
 	player->Release();
 	delete player;
 	player = nullptr;
@@ -537,14 +538,14 @@ void GameScene::CollisionCheck(void)
 		Vector2 eSize = e->GetEnemySize();
 
 		// ’e‚Æ‚Ì”»’è
-		for (auto& b : bullets) {
-			if (!b->IsShotState()) continue;
-			Vector2 bPos = AsoUtility::Round(b->GetBulletPos());
+		for (auto& b : bullet) {
+			if (!b.IsShotState()) continue;
+			Vector2 bPos = AsoUtility::Round(b.GetBulletPos());
 			Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
 
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
 				e->SetDamege(4);
-				b->BlastOn(b->GetBulletPos());
+				b.BlastOn(b.GetBulletPos());
 			}
 		}
 
@@ -600,30 +601,4 @@ bool GameScene::CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vect
 	return false;
 }
 
-void GameScene::CreateOrbitRing(int numBullets, float radius, float speed, int lifetime)
-{
-	Vector2 playerPos = player->GetPlayerPos();
-	float angleStep = 2.0f * 3.14159265f / numBullets;
 
-	for (int i = 0; i < numBullets; i++)
-	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
-
-		// ‰ŠúŠp“x‚ğ‹Ï“™‚ÉU‚è•ª‚¯
-		float angle = i * angleStep;
-		b->angle = angle;
-		b->radius = radius;
-		b->angularSpeed = speed;
-		b->orbitTime = lifetime;
-		b->isOrbit = true;
-		b->bulletType = Bullet::BulletType::ORBIT;
-
-		// ‰ŠúˆÊ’u
-		b->bPos.x = playerPos.x + cosf(angle) * radius;
-		b->bPos.y = playerPos.y + sinf(angle) * radius;
-
-		bullets.push_back(b);
-	}
-}

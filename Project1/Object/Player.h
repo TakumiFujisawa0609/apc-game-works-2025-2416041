@@ -2,7 +2,7 @@
 #include "../Common/Geometry.h"
 #include "../Common/AsoUtility.h"
 #include "../Scene/Stage/StageBase.h"
-#include "../Scene/SceneBase.h"
+#include "../Scene/GameScene.h"
 #include "Bullet.h"
 
 class Bullet;

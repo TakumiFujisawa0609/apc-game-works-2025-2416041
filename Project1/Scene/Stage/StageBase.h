@@ -80,7 +80,7 @@ private:
 	// 地上マップデータ
 	int groundMapDat[MAP_GROUND_NUM_Y][MAP_GROUND_NUM_X];
 
-	Position2 mapDispStPos; // マップ表示開始座標 
+	Vector2 mapDispStPos; // マップ表示開始座標 
 
 	void ClearDispMap(void);
 

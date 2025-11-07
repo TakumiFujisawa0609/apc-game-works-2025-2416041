@@ -19,13 +19,7 @@ public:
         int y;
     };
 
-    //敵の弾の構造体
-    struct B{
-        Vector2 pos;//座標
-        Vector2 vel;//速度
-        bool isActive = false;//生きてるか～？
-        Vector2 accel = { 0, 0 }; //加速度（必要なら使う）
-    };
+    
 
     // スクロールを発生させる範囲
     static constexpr int SCROLL_AREA_WID = 150;
@@ -53,13 +47,9 @@ public:
 private:
     StageBase* stage;  // Stageクラスのインスタンスのポインタ
     Player* player;    // Playerクラスのインスタンスのポインタ
+    std::vector<Bullet> bullet;
 
-    // 複数に変更！
-    std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
-
-	B bullet_magazine[256] = {}; //味方の弾の弾倉
     float bullet_speed = 5.0f;
-
 
     // 敵関連
     std::vector<Enemy*> enemys;   // 複数の敵を動的に管理
@@ -86,7 +76,6 @@ private:
     bool IsCollisionStage(Vector2 worldPos);
     void CollisionCheck(void);
     bool CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vector2 centerPos2, Vector2 size2);
-    void CreateOrbitRing(int numBullets, float radius, float speed, int lifetime);
    
 };
 
