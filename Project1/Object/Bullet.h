@@ -1,5 +1,5 @@
 #pragma once
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 #include "../Common/Vector2F.h"
 #include "../Common/AsoUtility.h"
 #include "../Object/Player.h"
@@ -13,9 +13,9 @@ public:
 	static constexpr int BULLET_SIZE_WID = 60; // 弾の横サイズ
 	static constexpr int BULLET_SIZE_HIG = 40; // 弾の縦サイズ
 	//static constexpr int ANIM_NUMS = 2; // 弾のアニメーション数
-	static constexpr float MOVE_SPEED = 5.0f; // 移動速度
 	static constexpr int ANIM_INTERVAL = 5; // 弾のアニメーションの更新間隔
 	static constexpr int ALIVE_TIME = 30; // 弾の生存時間
+	static constexpr int BULLET_SPEED = 8; // 弾の移動速度
 	static constexpr int BLAST_SIZE_WID = 32; // 爆発のサイズ
 	static constexpr int BLAST_SIZE_HIG = 32;
 	static constexpr int BLAST_ANIM_XNUM = 4; // 爆発画像ファイル内の横方向のパターン数
@@ -57,31 +57,25 @@ public:
 	Vector2F GetBulletPos(void) { return bPos; }
 	// 爆発表示開始
 	void BlastOn(Vector2F pos);
-	void CreateOrbit(Vector2F center, float rad, float speed, int time);
 
-
-
-	// 円運動用
-	bool isOrbit = false;         // 円運動中かどうか
-	Vector2F centerPos;           // 回る中心座標（プレイヤーの座標）
-	float radius = 50.0f;         // 回る半径
-	float angle = 0.0f;           // 現在の角度
-	float angularSpeed = 0.1f;    // 回転速度（ラジアン/frame）
-	int orbitTime = 120;           // 回る時間（フレーム）
+	bool isActive = false;//生きてるかどうか
 
 	BulletType bulletType = BulletType::NORMAL;
 
 	Vector2F bPos; // 弾の座標
 	Vector2F bVec; // 弾の移動方向のベクトル(単位ベクトル)
+
+	Vector2 vel;//速度
+
+	Vector2 accel = { 0, 0 }; //加速度（必要なら使う）
 	
+	STATUS bNowStat; // 弾の状態
 private:
 	GameScene* gInst; // ゲームシーンクラスのインスタンスのポインタ
 	Player* player; // プレイヤークラスのインスタンスのポインタ
 
 	int img; // 弾の画像のハンドル番号テーブル
 	int blastImage[BLAST_ANIM_MAX]; // 爆発画像のハンドル番号テーブル
-
-	STATUS bNowStat; // 弾の状態
 
 	int bDir; // 弾の移動方向
 	int aliveCounter; // 弾の生存時間のカウンター
@@ -93,7 +87,6 @@ private:
 	unsigned int frame = 0;//フレーム管理用
 
 	// 弾の状態毎の更新処理
-	void UpdateMove(void);
 	void UpdateBlast(void);
 	void UpdateEnd(void);
 	// 弾の状態毎の描画処理

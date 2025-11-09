@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../StDefineData.h"
-#include "../../Common/Vector2.h"
+#include "../../Common/Geometry.h"]
 #include "../../Application.h"
 
 class StageBase

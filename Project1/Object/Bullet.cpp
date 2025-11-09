@@ -1,6 +1,6 @@
 #include <DxLib.h>
 #include "Bullet.h"
-#include "../Scene/SceneBase.h"
+#include "../Scene/GameScene.h"
 #include "../Scene/Stage/StageBase.h"
 #include "Player.h"
 #include "../Application.h"
@@ -47,7 +47,14 @@ void Bullet::Update(void)
 	switch (bNowStat) {
 	case Bullet::STATUS::E_STAT_MOVE:
 		// 弾の移動
-		UpdateMove();
+		bPos.x += bVec.x * BULLET_SPEED;  // ← 速度定数をかけて進める
+        bPos.y += bVec.y * BULLET_SPEED;
+
+        // 画面外に出たら爆発 or 終了
+        if (bPos.x < 0 || bPos.x > 640 || bPos.y < 0 || bPos.y > 480) {
+            ChangeStatus(STATUS::E_STAT_END);
+        }
+
 		break;
 	case Bullet::STATUS::E_STAT_BLAST:
 		// 弾の爆発アニメーション
@@ -58,41 +65,7 @@ void Bullet::Update(void)
 		break;
 	}
 }
-// 弾の状態毎の更新処理
-void Bullet::UpdateMove(void)
-{
-	if (bulletType == BulletType::ORBIT && isOrbit)
-	{
-		// プレイヤー座標を中心に追従
-		Vector2 pPos = gInst->GetLpPlayer()->GetPlayerPos();
-		centerPos.x = static_cast<float>(pPos.x);
-		centerPos.y = static_cast<float>(pPos.y);
 
-		// 角度を更新
-		angle += angularSpeed;
-		bPos.x = centerPos.x + cosf(angle) * radius;
-		bPos.y = centerPos.y + sinf(angle) * radius;
-
-		orbitTime--;
-		if (orbitTime <= 0)
-		{
-			isOrbit = false;
-			BlastOn(bPos); // 生存時間終了で爆発
-		}
-	}
-	else
-	{
-		// 通常弾の移動
-		bPos.x += bVec.x * 10.0f; // 速度
-		bPos.y += bVec.y * 10.0f;
-
-		aliveCounter--;
-		if (aliveCounter <= 0)
-			BlastOn(bPos);
-	}
-
-	animCounter++;
-}
 void Bullet::UpdateBlast(void)
 {
 	blastAnimCounter++;
@@ -229,21 +202,5 @@ void Bullet::BlastOn(Vector2F pos)
 	ChangeStatus(Bullet::STATUS::E_STAT_BLAST);
 }
 
-void Bullet::CreateOrbit(Vector2F center, float rad, float speed, int time)
-{
-	centerPos = center;
-	radius = rad;
-	angularSpeed = speed;
-	orbitTime = time;
-	angle = 0.0f;
-	isOrbit = true;
-	bulletType = BulletType::ORBIT;
-
-	bPos.x = center.x + cosf(angle) * radius;
-	bPos.y = center.y + sinf(angle) * radius;
-
-	ChangeStatus(STATUS::E_STAT_MOVE);
-
-}
 
 

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <list>
-#include "../Common/Vector2.h"
+#include "../Common/Geometry.h"
 #include "../StDefineData.h"
 
 class StageBase;
@@ -13,6 +13,14 @@ class Bullet;
 class GameScene
 {
 public:
+
+    struct Position2 {
+        int x;
+        int y;
+    };
+
+    
+
     // スクロールを発生させる範囲
     static constexpr int SCROLL_AREA_WID = 150;
     static constexpr int SCROLL_AREA_HIG = 100;
@@ -39,9 +47,9 @@ public:
 private:
     StageBase* stage;  // Stageクラスのインスタンスのポインタ
     Player* player;    // Playerクラスのインスタンスのポインタ
+    std::vector<Bullet> bullet;
 
-    // 複数に変更！
-    std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
+    float bullet_speed = 5.0f;
 
     // 敵関連
     std::vector<Enemy*> enemys;   // 複数の敵を動的に管理
@@ -56,6 +64,8 @@ private:
     int limitTime;      // 制限時間（ミリ秒）
     bool isClear;       // クリア判定
 
+    unsigned int frame;//フレーム管理用
+
     // シーン遷移ID
     E_SCENE_ID nextSceneID;
 
@@ -66,7 +76,7 @@ private:
     bool IsCollisionStage(Vector2 worldPos);
     void CollisionCheck(void);
     bool CollisionCheckRectCenter(Vector2 centerPos1, Vector2 size1, Vector2 centerPos2, Vector2 size2);
-    void CreateOrbitRing(int numBullets, float radius, float speed, int lifetime);
+   
 };
 
 

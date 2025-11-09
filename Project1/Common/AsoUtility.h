@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Vector2.h"
+#include "Geometry.h"
 #include "Vector2F.h"
 class AsoUtility
 {

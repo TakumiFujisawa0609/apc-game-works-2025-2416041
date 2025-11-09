@@ -86,7 +86,10 @@ void InputManager::Update(void)
 
 	// マウス検知
 	mouseInput_ = GetMouseInput();
-	GetMousePoint(&mousePos_.x, &mousePos_.y);
+	int mx, my;
+	GetMousePoint(&mx, &my);
+	mousePos_.x = static_cast<float>(mx);
+	mousePos_.y = static_cast<float>(my);
 
 	for (auto& p : mouseInfos_)
 	{

@@ -2,7 +2,7 @@
 #include "SceneManager.h"
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
-#include "../Scene/SceneBase.h"
+#include "../Scene/GameScene.h"
 #include "../Scene/GameOver.h"
 #include "../Scene/GameClear.h"
 SceneManager::SceneManager(void)

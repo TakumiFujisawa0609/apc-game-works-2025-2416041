@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
-#include "../../Common/Vector2.h"
+#include "../../Common/Geometry.h"
 #include "../../Common/Vector2F.h"
 #include "../../Common/AsoUtility.h"
 class GameScene;
 class Enemy
 {
 public:
+
 	enum class ENEMY_TYPE
 	{
 		E_TYPE_NORMAL,
