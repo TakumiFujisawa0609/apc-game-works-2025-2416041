@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SceneBase.h"
+#include "GameScene.h"
 #include "../Application.h"
 #include "../Manager/SoundManager.h"
 

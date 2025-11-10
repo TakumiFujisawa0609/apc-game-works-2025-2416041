@@ -1,6 +1,6 @@
 #include <DxLib.h>
 #include "Bullet.h"
-#include "../Scene/SceneBase.h"
+#include "../Scene/GameScene.h"
 #include "../Scene/Stage/StageBase.h"
 #include "Player.h"
 #include "../Application.h"

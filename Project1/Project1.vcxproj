@@ -139,6 +139,7 @@
     <ClCompile Include="Common\Fader.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="Object\Player.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\SceneBase.cpp" />
     <ClCompile Include="Scene\GameOver.cpp" />
     <ClCompile Include="Scene\GameClear.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Common\Fader.h" />
     <ClInclude Include="Object\Enemy.h" />
     <ClInclude Include="Object\Player.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\SceneBase.h" />
     <ClInclude Include="Scene\GameOver.h" />
     <ClInclude Include="Scene\GameClear.h" />
