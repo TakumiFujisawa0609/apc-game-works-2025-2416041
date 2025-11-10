@@ -1,7 +1,7 @@
 
 // GameScene class
 #include <DxLib.h>
-#include "SceneBase.h"
+#include "GameScene.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
 #include "../Object/Player.h"
@@ -31,18 +31,17 @@ GameScene::~GameScene(void)
 bool GameScene::SystemInit(void)
 {
 	stage = new StageBase();
-	if (stage == nullptr)return false;
-	player = new Player(this);
-	if (player == nullptr)return false;
+	if (!stage) return false;
 
-	if (stage->SystemInit() == -1)return false;
+	player = new Player(this);
+	if (!player) return false;
+
+	if (stage->SystemInit() == -1) return false;
 	player->SystemInit();
-	
-	// ’e‚Ì‹¤’ÊƒŠƒ\[ƒX“Ç‚İ‚İi‰æ‘œ‚È‚Çj
-	Bullet* tmp = new Bullet(this);
-	if (!tmp->SystemInit()) return false;
-	delete tmp; // ŒÂ•Ê’e‚Í Update() ‚Å¶¬
-	bullets.clear();
+
+	// ’eŠÇ—‚ğì‚é
+	bulletManager = new BulletManager(this);
+	if (!bulletManager->SystemInit()) return false;
 
 	return true;
 }
@@ -53,20 +52,15 @@ void GameScene::GameInit(void)
 	stage->GameInit();
 	player->GameInit();
 
-	// ’e‚Ì‰Šú‰»
-	for (auto& b : bullets) { // ‚à‚µŠù‚Éc‚Á‚Ä‚¢‚é’e‚ª‚ ‚ê‚Îíœ
-		b->Release();
-		delete b;
-	}
+	if (bulletManager)
+		bulletManager->GameInit();
 
-	bullets.clear();
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
 
-	//§ŒÀŠÔƒ^ƒCƒ}[‰Šú‰»
 	startTime = GetNowCount();
-	limitTime = 90000; // 30•b‘Ï‹v‚ÅƒNƒŠƒA
+	limitTime = 90000;
 	isClear = false;
 }
 
@@ -80,45 +74,38 @@ void GameScene::Update(void)
 	static int shotTimer = 0;
 	const int SHOT_INTERVAL = 30;
 
-	// ’e‚Ì”­Ë
+	// ’Êí’e
 	shotTimer++;
-	if (shotTimer >= SHOT_INTERVAL)
-	{
+	if (shotTimer >= SHOT_INTERVAL) {
 		shotTimer = 0;
-		Bullet* newBullet = new Bullet(this);
-		newBullet->SystemInit();
-		newBullet->GameInit();
-
 		Vector2 pos = player->GetPlayerPos();
 		Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
-		newBullet->Create(posF, player->GetPlayerDir());
-
-		bullets.push_back(newBullet);
+		Vector2F dir;
+		switch (player->GetPlayerDir()) {
+		case AsoUtility::DIRECTION::E_DIR_UP:    dir = { 0.0f, -1.0f }; break;
+		case AsoUtility::DIRECTION::E_DIR_DOWN:  dir = { 0.0f,  1.0f }; break;
+		case AsoUtility::DIRECTION::E_DIR_LEFT:  dir = { -1.0f, 0.0f }; break;
+		case AsoUtility::DIRECTION::E_DIR_RIGHT: dir = { 1.0f,  0.0f }; break;
+		}
+		bulletManager->CreateNormal(posF, dir);
 	}
 
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
-	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
+	// ORBIT’e
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z)) {
 		Vector2 pos = player->GetPlayerPos();
-		b->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
-		bullets.push_back(b);
+		bulletManager->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
 	}
 
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1))
-	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
+	// RAIN’e
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1)) {
 		Vector2 pos = player->GetPlayerPos();
-		b->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
-		bullets.push_back(b);
+		bulletManager->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
 	}
 
 
-	// ’e‚ÌXV
-	for (auto& b : bullets) b->Update();
+	
+	if (bulletManager)
+		bulletManager->Update();
 
 	// I—¹‚µ‚½’e‚ğíœ
 	bullets.erase(
@@ -262,7 +249,9 @@ void GameScene::Draw(void)
 	for (int ii = 0; ii < size; ii++) {
 		enemys[ii]->Draw();
 	}
-	for (auto& b : bullets) b->Draw();
+	
+	if (bulletManager)
+		bulletManager->Draw();
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	int php = player->GetHp();
@@ -289,20 +278,22 @@ void GameScene::Draw(void)
 // ‰ğ•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚İÀs)
 bool GameScene::Release(void)
 {
-	// “G‚Ì‰ğ•ú
 	EraseEnemys();
-	// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì‰ğ•ú
-	for (auto& b : bullets) {
-		b->Release();
-		delete b;
+
+	if (bulletManager) {
+		bulletManager->Release();
+		delete bulletManager;
+		bulletManager = nullptr;
 	}
-	bullets.clear();
+
 	player->Release();
 	delete player;
 	player = nullptr;
+
 	stage->Release();
 	delete stage;
 	stage = nullptr;
+
 	return true;
 }
 

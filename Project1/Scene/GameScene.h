@@ -4,6 +4,7 @@
 #include <list>
 #include "../Common/Vector2.h"
 #include "../StDefineData.h"
+#include "../Manager/BulletManager.h"
 
 class StageBase;
 class Player;
@@ -39,6 +40,7 @@ public:
 private:
     StageBase* stage;  // Stageクラスのインスタンスのポインタ
     Player* player;    // Playerクラスのインスタンスのポインタ
+    BulletManager* bulletManager = nullptr;
 
     // 複数に変更！
     std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
