@@ -8,6 +8,11 @@ class InputManager
 
 public:
 
+	struct Stick {
+		float x;
+		float y;
+	};
+
 	// ゲームコントローラーの認識番号
 	// DxLib定数、DX_INPUT_PAD1等に対応
 	enum class JOYPAD_NO
@@ -118,6 +123,9 @@ public:
 	bool IsPadBtnNew(JOYPAD_NO no, JOYPAD_BTN btn) const;
 	bool IsPadBtnTrgDown(JOYPAD_NO no, JOYPAD_BTN btn) const;
 	bool IsPadBtnTrgUp(JOYPAD_NO no, JOYPAD_BTN btn) const;
+
+	Stick GetPadLStick(JOYPAD_NO no, float deadzone = 0.20f, bool invertY = false) const;
+	Stick GetPadRStick(JOYPAD_NO no, float deadzone = 0.20f, bool invertY = false) const;
 
 private:
 

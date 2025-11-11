@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include "Application.h"
 
+
 // WinMainä÷êî
 //---------------------------------
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

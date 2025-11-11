@@ -30,6 +30,7 @@ bool SceneManager::SystemInit(void)
 	fader->SystemInit();
 	sceneChangeFlg = false;
 	ChangeScene(E_SCENE_TITLE);
+	InputManager::CreateInstance();
 
 	gamePause = ON_OFF::GAME;
 

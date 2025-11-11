@@ -1,4 +1,5 @@
 #include <DxLib.h>
+#include <cmath>
 #include "InputManager.h"
 
 InputManager* InputManager::instance_ = nullptr;
@@ -369,4 +370,50 @@ bool InputManager::IsPadBtnTrgDown(JOYPAD_NO no, JOYPAD_BTN btn) const
 bool InputManager::IsPadBtnTrgUp(JOYPAD_NO no, JOYPAD_BTN btn) const
 {
 	return padInfos_[static_cast<int>(no)].IsTrgUp[static_cast<int>(btn)];
+}
+InputManager::Stick InputManager::GetPadLStick(JOYPAD_NO no, float deadzone, bool invertY) const
+{
+	int idx = static_cast<int>(no);
+	auto st = padInfos_[idx];
+
+	auto norm = [](int v) -> float {
+		if (std::abs(v) <= 1) return static_cast<float>(v);
+		float f = static_cast<float>(v) / 32767.0f;
+		if (f < -1.0f) f = -1.0f;
+		if (f > 1.0f) f = 1.0f;
+		return f;
+		};
+
+	float x = norm(st.AKeyLX);
+	float y = norm(st.AKeyLY);
+	if (invertY) y = -y;
+
+	// 円形デッドゾーン
+	float mag = std::sqrt(x * x + y * y);
+	if (mag < deadzone) return { 0.0f, 0.0f };
+
+	return { x, y };
+}
+
+InputManager::Stick InputManager::GetPadRStick(JOYPAD_NO no, float deadzone, bool invertY) const
+{
+	int idx = static_cast<int>(no);
+	auto st = padInfos_[idx];
+
+	auto norm = [](int v) -> float {
+		if (std::abs(v) <= 1) return static_cast<float>(v);
+		float f = static_cast<float>(v) / 32767.0f;
+		if (f < -1.0f) f = -1.0f;
+		if (f > 1.0f) f = 1.0f;
+		return f;
+		};
+
+	float x = norm(st.AKeyRX);
+	float y = norm(st.AKeyRY);
+	if (invertY) y = -y;
+
+	float mag = std::sqrt(x * x + y * y);
+	if (mag < deadzone) return { 0.0f, 0.0f };
+
+	return { x, y };
 }

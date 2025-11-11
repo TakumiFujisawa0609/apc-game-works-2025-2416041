@@ -78,6 +78,9 @@ void GameScene::GameInit(void)
 // 更新処理
 void GameScene::Update(void)
 {
+	
+	InputManager::GetInstance().Update();
+
 	Vector2 oldPos = player->GetPlayerPos(); // 移動前のプレイヤーの位置
 	stage->Update();
 	player->Update();

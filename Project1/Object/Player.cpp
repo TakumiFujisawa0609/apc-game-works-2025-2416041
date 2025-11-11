@@ -65,33 +65,12 @@ void Player::Update(void)
     // ───────────────
     // パッド（PAD1）
     auto& pad = InputManager::GetInstance();
-    // 毎フレーム更新（必要なら有効化）
-    if constexpr (true) { pad.Update(); }
 
     auto st = pad.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
-    // 値レンジ自動判別
-    auto norm = [](float v) {
-        return (fabsf(v) > 1.5f) ? (v / 32767.0f) : v;
-        };
-    float lx = norm(st.AKeyLX);
-    float ly = norm(st.AKeyLY);
-
-    // デッドゾーン
-    const float DEAD = 0.20f;
-    if (fabsf(lx) < DEAD) lx = 0.0f;
-    if (fabsf(ly) < DEAD) ly = 0.0f;
-
-    // 
-    constexpr bool INVERT_Y = false;
-    moveX += lx * MOVE_SPEED;
-    moveY += (INVERT_Y ? -ly : ly) * MOVE_SPEED;
-
-    //// 方向ボタン
-    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP))    moveY = -MOVE_SPEED;
-    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))   moveY = MOVE_SPEED;
-    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT))   moveX = -MOVE_SPEED;
-    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))  moveX = MOVE_SPEED;
+	auto ls = pad.GetPadLStick(InputManager::JOYPAD_NO::PAD1, 0.20f, false);
+	moveX += ls.x * MOVE_SPEED;
+	moveY += ls.y * MOVE_SPEED;
 
     // ───────────────
     // 移動
