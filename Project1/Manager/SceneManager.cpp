@@ -5,6 +5,9 @@
 #include "../Scene/GameScene.h"
 #include "../Scene/GameOver.h"
 #include "../Scene/GameClear.h"
+
+#include "../Manager/InputManager.h"
+
 SceneManager::SceneManager(void)
 {
 	fader = nullptr;
@@ -27,6 +30,9 @@ bool SceneManager::SystemInit(void)
 	fader->SystemInit();
 	sceneChangeFlg = false;
 	ChangeScene(E_SCENE_TITLE);
+
+	gamePause = ON_OFF::GAME;
+
 	return true;
 }
 // ゲーム起動・再開時に必ず呼び出す処理
@@ -36,6 +42,8 @@ void SceneManager::GameInit(void)
 // 更新処理
 void SceneManager::Update(void)
 {
+	InputManager& input = InputManager::GetInstance();
+
 	fader->Update();
 	if (sceneChangeFlg) {
 		// シーンチェンジ実行中
@@ -50,30 +58,57 @@ void SceneManager::Update(void)
 	}
 	else {
 		E_SCENE_ID nextSceneID = scene_ID;
-		switch (scene_ID) {
-		case E_SCENE_TITLE:
-			titleInst->Update();
-			nextSceneID = titleInst->GetNextSceneID();
+
+		switch (gamePause)
+		{
+		case SceneManager::ON_OFF::GAME:
+
+			// こっちはゲーム画面の処理
+
+			if (input.IsTrgDown(KEY_INPUT_ESCAPE)) {
+				// エスケープキーを押したらポーズ画面に遷移
+				gamePause = ON_OFF::PAUSE;
+				break;
+			}
+
+			switch (scene_ID) {
+			case E_SCENE_TITLE:
+				titleInst->Update();
+				nextSceneID = titleInst->GetNextSceneID();
+				break;
+			case E_SCENE_GAME:
+				gameInst->Update();
+				nextSceneID = gameInst->GetNextSceneID();
+				break;
+			case E_SCENE_GAMEOVER:
+				gameover->Update();
+				nextSceneID = gameover->GetNextSceneID();
+				break;
+			case E_SCENE_GAMECLEAR:
+				gameclear->Update();
+				nextSceneID = gameclear->GetNextSceneID();
+				break;
+			}
+
+			// シーン遷移判定
+			if (scene_ID != nextSceneID) {
+				sceneChangeFlg = true;
+				waitScene = nextSceneID;
+				fader->SetFade(E_STAT_FADE_OUT);
+			}
+
 			break;
-		case E_SCENE_GAME:
-			gameInst->Update();
-			nextSceneID = gameInst->GetNextSceneID();
+		case SceneManager::ON_OFF::PAUSE:
+			// ここがポーズ画面の処理
+			if (input.IsTrgDown(KEY_INPUT_ESCAPE)) {
+				// エスケープキーを押したらゲーム画面に遷移
+				gamePause = ON_OFF::GAME;
+			}
+
 			break;
-		case E_SCENE_GAMEOVER:
-			gameover->Update();
-			nextSceneID = gameover->GetNextSceneID();
-			break;
-		case E_SCENE_GAMECLEAR:
-			gameclear->Update();
-			nextSceneID = gameclear->GetNextSceneID();
-			break;
+
 		}
-		// シーン遷移判定
-		if (scene_ID != nextSceneID) {
-			sceneChangeFlg = true;
-			waitScene = nextSceneID;
-			fader->SetFade(E_STAT_FADE_OUT);
-		}
+
 	}
 }
 // 描画処理

@@ -19,7 +19,7 @@ public:
     static constexpr int SCROLL_AREA_HIG = 100;
 
     // エンカウント(値が大きいと出現する間隔が長くなる）
-    static constexpr int ENCOUNT = 2000;
+    static constexpr int ENCOUNT = 20;
 
     GameScene(void);
     ~GameScene(void);
@@ -57,6 +57,10 @@ private:
     int startTime;      // 開始時間（ミリ秒）
     int limitTime;      // 制限時間（ミリ秒）
     bool isClear;       // クリア判定
+
+    int autoShotTimer_;
+    int autoOrbitTimer_;
+    int autoFanTimer_;
 
     // シーン遷移ID
     E_SCENE_ID nextSceneID;

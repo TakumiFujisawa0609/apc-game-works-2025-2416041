@@ -28,4 +28,12 @@ private:
 	// ƒV[ƒ“‘JˆÚˆ—
 	bool ChangeScene(E_SCENE_ID id);
 	void ReleaseScene(E_SCENE_ID id);
+
+	enum class ON_OFF
+	{
+		GAME,
+		PAUSE
+	};
+
+	ON_OFF gamePause;
 };

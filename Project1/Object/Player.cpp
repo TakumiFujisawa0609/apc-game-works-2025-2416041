@@ -55,34 +55,50 @@ void Player::Update(void)
     float moveX = 0.0f;
     float moveY = 0.0f;
 
-    // -----------------------------
-    // キーボード入力
+    // ───────────────
+    // キーボード
     if (CheckHitKey(KEY_INPUT_W)) moveY -= MOVE_SPEED;
     if (CheckHitKey(KEY_INPUT_S)) moveY += MOVE_SPEED;
     if (CheckHitKey(KEY_INPUT_A)) moveX -= MOVE_SPEED;
     if (CheckHitKey(KEY_INPUT_D)) moveX += MOVE_SPEED;
 
-    // -----------------------------
-    // ゲームパッド入力（PAD1固定）
+    // ───────────────
+    // パッド（PAD1）
     auto& pad = InputManager::GetInstance();
-    auto padState = pad.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+    // 毎フレーム更新（必要なら有効化）
+    if constexpr (true) { pad.Update(); }
 
-    // アナログスティック
-    moveX += (padState.AKeyLX / 32768.0f) * MOVE_SPEED;
-    moveY += (padState.AKeyLY / 32768.0f) * MOVE_SPEED;
+    auto st = pad.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
-    // 方向ボタン（優先度高）
-    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP)) moveY = -MOVE_SPEED;
-    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) moveY = MOVE_SPEED;
-    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT)) moveX = -MOVE_SPEED;
-    if (pad.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) moveX = MOVE_SPEED;
+    // 値レンジ自動判別
+    auto norm = [](float v) {
+        return (fabsf(v) > 1.5f) ? (v / 32767.0f) : v;
+        };
+    float lx = norm(st.AKeyLX);
+    float ly = norm(st.AKeyLY);
 
-    // -----------------------------
-    // 移動適用
+    // デッドゾーン
+    const float DEAD = 0.20f;
+    if (fabsf(lx) < DEAD) lx = 0.0f;
+    if (fabsf(ly) < DEAD) ly = 0.0f;
+
+    // 
+    constexpr bool INVERT_Y = false;
+    moveX += lx * MOVE_SPEED;
+    moveY += (INVERT_Y ? -ly : ly) * MOVE_SPEED;
+
+    //// 方向ボタン
+    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::TOP))    moveY = -MOVE_SPEED;
+    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))   moveY = MOVE_SPEED;
+    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT))   moveX = -MOVE_SPEED;
+    //if (pad.IsPadBtnDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))  moveX = MOVE_SPEED;
+
+    // ───────────────
+    // 移動
     playerPos.x += moveX;
     playerPos.y += moveY;
 
-    // 画面端補正（ワールド座標）
+    // 画面端補正
     if (playerPos.x < PLAYER_WID / 2) playerPos.x = PLAYER_WID / 2;
     if (playerPos.x > (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2)
         playerPos.x = (StageBase::MAP_CHIP_SIZE_WID * StageBase::MAP_GROUND_NUM_X) - PLAYER_WID / 2;
@@ -91,15 +107,13 @@ void Player::Update(void)
     if (playerPos.y > (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2)
         playerPos.y = (StageBase::MAP_CHIP_SIZE_HIG * StageBase::MAP_GROUND_NUM_Y) - PLAYER_HIG / 2;
 
-    // -----------------------------
-    // 向き設定（移動方向優先）
+    // 向き（移動優先）
     if (moveX < 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_LEFT);
     else if (moveX > 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_RIGHT);
     if (moveY < 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_UP);
     else if (moveY > 0) playerDir = static_cast<int>(AsoUtility::DIRECTION::E_DIR_DOWN);
 
-
-    // 弾の更新
+    // 弾
     bullet->Update();
 }
 // 描画処理

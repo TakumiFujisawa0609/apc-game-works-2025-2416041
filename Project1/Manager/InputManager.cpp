@@ -51,6 +51,7 @@ void InputManager::Init(void)
 	InputManager::GetInstance().Add(KEY_INPUT_2);
 
 
+
 	InputManager::MouseInfo info;
 
 	// ¶ƒNƒŠƒbƒN

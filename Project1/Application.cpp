@@ -57,7 +57,7 @@ bool Application::SystemInit(void)
 // ゲーム起動
 void Application::Run(void)
 {
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0) {
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_1) == 0) {
 		Update(); // 更新
 		Draw(); // 描画
 	}

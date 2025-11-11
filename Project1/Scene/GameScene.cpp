@@ -69,6 +69,10 @@ void GameScene::GameInit(void)
 	startTime = GetNowCount();
 	limitTime = 90000;
 	isClear = false;
+
+	autoShotTimer_ = 0;
+	autoOrbitTimer_ = 0;
+	autoFanTimer_ = 0;
 }
 
 // 更新処理
@@ -81,88 +85,101 @@ void GameScene::Update(void)
 	static int shotTimer = 0;
 	const int SHOT_INTERVAL = 30;
 
-	// 弾の発射
-	shotTimer++;
-	if (shotTimer >= SHOT_INTERVAL)
+	
+	autoShotTimer_++;
+	autoOrbitTimer_++;
+	autoFanTimer_++;
+
+	// 直進の通常弾（一定間隔）
 	{
-		shotTimer = 0;
-		Bullet* newBullet = new Bullet(this);
-		newBullet->SystemInit();
-		newBullet->GameInit();
-
-		Vector2 pos = player->GetPlayerPos();
-		Vector2F posF(static_cast<float>(pos.x),
-			static_cast<float>(pos.y));
-		newBullet->Create(posF, player->GetPlayerDir());
-		bullets.push_back(newBullet);
-	}
-	// 回転弾の発射
-	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
-	{
-		Vector2 pos = player->GetPlayerPos();
-
-		constexpr int   N = 5;      // 発射数
-		const     float radius = 80.0f;  // 半径
-		const     float omega = 0.1f;   // 角速度(ラジアン/フレーム)
-		const     int   life = 600;    // 寿命(フレーム)
-		const     float TWO_PI = 6.28318530718f;
-
-		for (int i = 0; i < N; ++i)
+		constexpr int SHOT_INTERVAL = 30; //30フレームごと
+		if (autoShotTimer_ >= SHOT_INTERVAL)
 		{
-			Bullet* b = new Bullet(this);
-			b->SystemInit();
-			b->GameInit();
+			autoShotTimer_ = 0;
 
-			// まず通常の回転弾として生成
-			b->CreateOrbit({ static_cast<float>(pos.x), static_cast<float>(pos.y) },
-				radius, omega, life);
+			Bullet* newBullet = new Bullet(this);
+			newBullet->SystemInit();
+			newBullet->GameInit();
 
-			// 各弾の初期角度をずらす（72°刻み）
-			b->angle = (TWO_PI / N) * i;
-
-			// その角度に合わせて初期位置も再配置して重なり回避
-			b->bPos.x = static_cast<float>(pos.x) + std::cos(b->angle) * radius;
-			b->bPos.y = static_cast<float>(pos.y) + std::sin(b->angle) * radius;
-
-			bullets.push_back(b);
+			Vector2 pos = player->GetPlayerPos();
+			Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
+			newBullet->Create(posF, player->GetPlayerDir()); // 既存API
+			bullets.push_back(newBullet);
 		}
 	}
 
-	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Q))
+	// 回転弾（5発同時を一定間隔）
 	{
-		Vector2 pos = player->GetPlayerPos();
-
-		// 扇の設定
-		constexpr int   N = 10;                  // 発射数
-		constexpr float SPREAD = 3.1415926535f / 3;  // 総扇角＝60度
-		constexpr int   LIFE = 600;                // 寿命（回転弾と揃え）
-		const float     HALF = SPREAD * 0.5f;
-
-		// プレイヤー向き → 基準角（スクリーン座標の上下左右）
-		float baseAngle = 0.0f;
-		switch (player->GetPlayerDir()) {
-		case AsoUtility::DIRECTION::E_DIR_RIGHT: baseAngle = 0.0f;                      break;
-		case AsoUtility::DIRECTION::E_DIR_LEFT:  baseAngle = 3.1415926535f;             break; // π
-		case AsoUtility::DIRECTION::E_DIR_DOWN:  baseAngle = 3.1415926535f * 0.5f;      break; // +π/2
-		case AsoUtility::DIRECTION::E_DIR_UP:    baseAngle = -3.1415926535f * 0.5f;     break; // -π/2
-		default: break;
-		}
-
-		// 角度間隔：N本を等間隔で配置
-		const float step = (N > 1) ? (SPREAD / (N - 1)) : 0.0f;
-
-		for (int i = 0; i < N; ++i)
+		constexpr int ORBIT_INTERVAL = 600; //60×秒
+		if (autoOrbitTimer_ >= ORBIT_INTERVAL)
 		{
-			const float ang = baseAngle - HALF + step * i;
+			autoOrbitTimer_ = 0;
 
-			Bullet* b = new Bullet(this);
-			b->SystemInit();
-			b->GameInit();
+			Vector2 pos = player->GetPlayerPos();
 
-			// 任意角度で直進する通常弾を生成
-			b->CreateAngle({ static_cast<float>(pos.x), static_cast<float>(pos.y) }, ang, LIFE);
+			constexpr int   N = 5;
+			const     float radius = 80.0f;
+			const     float omega = 0.1f;
+			const     int   life = 600;
+			const     float TWO_PI = 6.28318530718f;
 
-			bullets.push_back(b);
+			for (int i = 0; i < N; ++i)
+			{
+				Bullet* b = new Bullet(this);
+				b->SystemInit();
+				b->GameInit();
+
+				b->CreateOrbit({ static_cast<float>(pos.x), static_cast<float>(pos.y) },
+					radius, omega, life);               // 回転弾:contentReference[oaicite:5]{index=5}
+
+				b->angle = (TWO_PI / N) * i;                        // 初期角度ずらし
+				b->bPos.x = static_cast<float>(pos.x) + std::cos(b->angle) * radius;
+				b->bPos.y = static_cast<float>(pos.y) + std::sin(b->angle) * radius;
+
+				bullets.push_back(b);
+			}
+		}
+	}
+
+	// 扇状弾（10発を一定間隔）
+	{
+		constexpr int FAN_INTERVAL = 90; //1.5秒
+		if (autoFanTimer_ >= FAN_INTERVAL)
+		{
+			autoFanTimer_ = 0;
+
+			Vector2 pos = player->GetPlayerPos();
+
+			constexpr int   N = 3;                         // 本数
+			constexpr float SPREAD = 3.1415926535f / 3.0f;       // 60度
+			constexpr int   LIFE = 600;                        // 寿命
+			const     float HALF = SPREAD * 0.5f;
+
+			// プレイヤー向き
+			float baseAngle = 0.0f;
+			switch (player->GetPlayerDir()) {
+			case AsoUtility::DIRECTION::E_DIR_RIGHT: baseAngle = 0.0f;                      break;
+			case AsoUtility::DIRECTION::E_DIR_LEFT:  baseAngle = 3.1415926535f;             break;
+			case AsoUtility::DIRECTION::E_DIR_DOWN:  baseAngle = 3.1415926535f * 0.5f;      break;
+			case AsoUtility::DIRECTION::E_DIR_UP:    baseAngle = -3.1415926535f * 0.5f;     break;
+			default: break;
+			}
+
+			const float step = (N > 1) ? (SPREAD / (N - 1)) : 0.0f;
+
+			for (int i = 0; i < N; ++i)
+			{
+				const float ang = baseAngle - HALF + step * i;
+
+				Bullet* b = new Bullet(this);
+				b->SystemInit();
+				b->GameInit();
+
+				b->CreateAngle({ static_cast<float>(pos.x), static_cast<float>(pos.y) },
+					ang, LIFE);                       
+
+				bullets.push_back(b);
+			}
 		}
 	}
 
@@ -211,7 +228,7 @@ void GameScene::Update(void)
 		case Enemy::ENEMY_TYPE::E_TYPE_EYE:
 			e = new Eenmy_eye();
 			break;
-		case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
+		/*case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
 			e = new Enemy_GoblinRun();
 			break;
 		case Enemy::ENEMY_TYPE::E_TYPE_MUSHROOM:
@@ -219,7 +236,7 @@ void GameScene::Update(void)
 			break;
 		case Enemy::ENEMY_TYPE::E_TYPE_SKELETON:
 			e = new Enemy_Skeleton();
-			break;
+			break;*/
 		}
 
 		if (e != nullptr) {
@@ -504,7 +521,7 @@ void GameScene::CollisionCheck(void)
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
 				e->SetDamege(1);
 				//命中位置から小拡散弾を準備（8方向）
-				const int   SHARD_COUNT = 8;
+				const int   SHARD_COUNT = 4;
 				const float TWO_PI = 6.28318530718f;
 				const float STEP = TWO_PI / SHARD_COUNT;
 				const int   SHARD_LIFE = 25;   // 短寿命
