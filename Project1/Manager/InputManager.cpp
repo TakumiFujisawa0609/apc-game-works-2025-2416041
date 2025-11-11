@@ -417,3 +417,30 @@ InputManager::Stick InputManager::GetPadRStick(JOYPAD_NO no, float deadzone, boo
 
 	return { x, y };
 }
+
+InputManager::DPad InputManager::GetPadDPad(JOYPAD_NO no) const
+{
+	// 直接DInputのPOV(ハットスイッチ)を読む
+	DINPUT_JOYSTATE st{};
+	GetJoypadDirectInputState(static_cast<int>(no), &st);
+
+	DPad dp{ false, false, false, false };
+
+	// POVは -1(未入力) か 0..35999(100分の1度)
+	int pov = st.POV[0];
+	if (pov < 0) return dp; // どこも押していない
+
+	int deg = pov / 100; // 角度(度)
+	auto nearDir = [](int d, int centerDeg) -> bool {
+		// ±45°をその方向として扱う（斜め入力は2方向がtrue）
+		int diff = (d - centerDeg) % 360;
+		if (diff < 0) diff += 360;
+		return (diff <= 45) || (diff >= 315);
+		};
+
+	dp.up = nearDir(deg, 0);
+	dp.right = nearDir(deg, 90);
+	dp.down = nearDir(deg, 180);
+	dp.left = nearDir(deg, 270);
+	return dp;
+}

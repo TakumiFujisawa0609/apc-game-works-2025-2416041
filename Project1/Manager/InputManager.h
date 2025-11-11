@@ -13,6 +13,8 @@ public:
 		float y;
 	};
 
+	struct DPad { bool up, down, left, right; };
+
 	// ゲームコントローラーの認識番号
 	// DxLib定数、DX_INPUT_PAD1等に対応
 	enum class JOYPAD_NO
@@ -127,6 +129,7 @@ public:
 	Stick GetPadLStick(JOYPAD_NO no, float deadzone = 0.20f, bool invertY = false) const;
 	Stick GetPadRStick(JOYPAD_NO no, float deadzone = 0.20f, bool invertY = false) const;
 
+	DPad GetPadDPad(JOYPAD_NO no) const;
 private:
 
 	// キー情報

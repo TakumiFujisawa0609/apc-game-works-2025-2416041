@@ -9,6 +9,6 @@ void Eenmy_eye::SetEnemyParam(void)
 	// 敵の画像サイズ
 	size = { 124, 35 };
 	// 敵の移動速度
-	speed = 2.0f;
-	hp = hpMax = 3;
+	speed = 4.0f;
+	hp = hpMax = 2    ;
 }

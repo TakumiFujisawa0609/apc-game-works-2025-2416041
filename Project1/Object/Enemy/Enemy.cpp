@@ -49,11 +49,16 @@ void Enemy::GameInit(void)
 	pos.y = static_cast<float>(rpos.y);
 	animCounter = 0;
 	aliveFlg = true;
+	iFrame = 0;
+
 }
 void Enemy::Update(void)
 {
 	animCounter++;
 	if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 100)animCounter = 0;
+
+	if (iFrame > 0) --iFrame;
+
 	// プレイヤーの位置
 	Vector2 pPos = gInst->GetLpPlayer()->GetPlayerPos();
 
@@ -122,10 +127,16 @@ bool Enemy::Release(void)
 }
 void Enemy::SetDamege(int dp)
 {
+	if (iFrame > 0 || !aliveFlg) return;
+
 	hp -= dp;
 	if (hp <= 0) {
 		hp = 0;
 		aliveFlg = false;
+	}
+	else {
+		// 追加: 次の数フレームは無敵
+		iFrame = HURT_IFRAME;
 	}
 }
 void Enemy::SetMoveDirection(Vector2F edir)

@@ -22,6 +22,8 @@ public:
 	static constexpr int ANIM_NUMS = 4; // 方向毎のアニメーション数
 	static constexpr int CHARA_MAX = ANIM_NUMS * static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX);
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
+	// 追加: 無敵時間の長さ（フレーム）
+	static constexpr int HURT_IFRAME = 6;
 	Enemy(void);
 	~Enemy(void);
 	virtual bool SystemInit(GameScene* gs); // 初期化処理(最初の１回のみ実行)
@@ -29,6 +31,11 @@ public:
 	virtual void Update(void); // 更新処理
 	virtual void Draw(void); // 描画処理
 	virtual bool Release(void); // 解放処理(最後の１回のみ実行)
+
+	bool IsInvincible() const { return iFrame > 0; }
+
+	void SetDamege(int dp);
+
 
 	// 敵キャラ個別のパラメータ設定処理(純粋仮想関数)
 	virtual void SetEnemyParam(void) = 0;
@@ -49,8 +56,6 @@ public:
 	// 敵の生存状態を設定する
 	virtual void SetAlive(bool bflg) { aliveFlg = bflg; }
 
-	void SetDamege(int dp);
-
 protected:
 	GameScene* gInst; // ゲームシーンのインスタンスのポインタ
 
@@ -68,6 +73,8 @@ protected:
 	int hpMax;
 	// 生存フラグ
 	bool aliveFlg;
+
+	int iFrame = 0;
 public:
 	// 敵の画像ファイル名
 	std::string imgFName;

@@ -67,7 +67,7 @@ void GameScene::GameInit(void)
 	nextSceneID = E_SCENE_GAME;
 
 	startTime = GetNowCount();
-	limitTime = 90000;
+	limitTime = 50000;
 	isClear = false;
 
 	autoShotTimer_ = 0;
@@ -95,7 +95,7 @@ void GameScene::Update(void)
 
 	// ’¼i‚Ì’Êí’eiˆê’èŠÔŠuj
 	{
-		constexpr int SHOT_INTERVAL = 30; //30ƒtƒŒ[ƒ€‚²‚Æ
+		constexpr int SHOT_INTERVAL = 20; //30ƒtƒŒ[ƒ€‚²‚Æ
 		if (autoShotTimer_ >= SHOT_INTERVAL)
 		{
 			autoShotTimer_ = 0;
@@ -113,14 +113,14 @@ void GameScene::Update(void)
 
 	// ‰ñ“]’ei5”­“¯‚ğˆê’èŠÔŠuj
 	{
-		constexpr int ORBIT_INTERVAL = 600; //60~•b
+		constexpr int ORBIT_INTERVAL = 360; //60~•b
 		if (autoOrbitTimer_ >= ORBIT_INTERVAL)
 		{
 			autoOrbitTimer_ = 0;
 
 			Vector2 pos = player->GetPlayerPos();
 
-			constexpr int   N = 5;
+			constexpr int   N = 4;
 			const     float radius = 80.0f;
 			const     float omega = 0.1f;
 			const     int   life = 600;
@@ -146,14 +146,14 @@ void GameScene::Update(void)
 
 	// îó’ei10”­‚ğˆê’èŠÔŠuj
 	{
-		constexpr int FAN_INTERVAL = 90; //1.5•b
+		constexpr int FAN_INTERVAL = 70; //1.5•b
 		if (autoFanTimer_ >= FAN_INTERVAL)
 		{
 			autoFanTimer_ = 0;
 
 			Vector2 pos = player->GetPlayerPos();
 
-			constexpr int   N = 3;                         // –{”
+			constexpr int   N = 6;                         // –{”
 			constexpr float SPREAD = 3.1415926535f / 3.0f;       // 60“x
 			constexpr int   LIFE = 600;                        // õ–½
 			const     float HALF = SPREAD * 0.5f;
@@ -522,32 +522,35 @@ void GameScene::CollisionCheck(void)
 			Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
 
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
-				e->SetDamege(1);
-				//–½’†ˆÊ’u‚©‚ç¬ŠgU’e‚ğ€”õi8•ûŒüj
-				const int   SHARD_COUNT = 4;
-				const float TWO_PI = 6.28318530718f;
-				const float STEP = TWO_PI / SHARD_COUNT;
-				const int   SHARD_LIFE = 25;   // ’Zõ–½
+				if (!e->IsInvincible()) {
+					e->SetDamege(1);
+					////–½’†ˆÊ’u‚©‚ç¬ŠgU’e‚ğ€”õi8•ûŒüj
+					const int   SHARD_COUNT = 3;
+					const float TWO_PI = 6.28318530718f;
+					const float STEP = TWO_PI / SHARD_COUNT;
+					const int   SHARD_LIFE = 25;   // ’Zõ–½
 
-				for (int i = 0; i < SHARD_COUNT; ++i) {
-					const float ang = STEP * i;
+					for (int i = 0; i < SHARD_COUNT; ++i) {
+						const float ang = STEP * i;
 
-					Bullet* nb = new Bullet(this);
-					nb->SystemInit();
-					nb->GameInit();
+						Bullet* nb = new Bullet(this);
+						nb->SystemInit();
+						nb->GameInit();
 
-					//”CˆÓŠp“x’¼i‚ğg
-					nb->CreateAngle(
-						{ static_cast<float>(bPos.x), static_cast<float>(bPos.y) },
-						ang,
-						SHARD_LIFE
-					);
+						//”CˆÓŠp“x’¼i‚ğg
+						nb->CreateAngle(
+							{ static_cast<float>(bPos.x), static_cast<float>(bPos.y) },
+							ang,
+							SHARD_LIFE
+						);
 
 					spawnQueue.push_back(nb);
-				}
+					}
 
-				// Œ³‚Ì’e‚Í”š”­
-				b->BlastOn(b->GetBulletPos());
+					// Œ³‚Ì’e‚Í”š”­
+					b->BlastOn(b->GetBulletPos());
+				}
+				
 			}
 		}
 

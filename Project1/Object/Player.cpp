@@ -49,33 +49,41 @@ void Player::GameInit(void)
 // 更新処理
 void Player::Update(void)
 {
-    animCounter++;
-    if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 10) animCounter = 0;
+	animCounter++;
+	if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 10) animCounter = 0;
 
-    float moveX = 0.0f;
-    float moveY = 0.0f;
+	float moveX = 0.0f;
+	float moveY = 0.0f;
 
-    // ───────────────
-    // キーボード
-    if (CheckHitKey(KEY_INPUT_W)) moveY -= MOVE_SPEED;
-    if (CheckHitKey(KEY_INPUT_S)) moveY += MOVE_SPEED;
-    if (CheckHitKey(KEY_INPUT_A)) moveX -= MOVE_SPEED;
-    if (CheckHitKey(KEY_INPUT_D)) moveX += MOVE_SPEED;
+	// ───────────────
+	// キーボード
+	if (CheckHitKey(KEY_INPUT_W)) moveY -= MOVE_SPEED;
+	if (CheckHitKey(KEY_INPUT_S)) moveY += MOVE_SPEED;
+	if (CheckHitKey(KEY_INPUT_A)) moveX -= MOVE_SPEED;
+	if (CheckHitKey(KEY_INPUT_D)) moveX += MOVE_SPEED;
 
-    // ───────────────
-    // パッド（PAD1）
-    auto& pad = InputManager::GetInstance();
+	// ───────────────
+	// パッド（PAD1）
+	auto& pad = InputManager::GetInstance();
 
-    auto st = pad.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
-
+	// 左スティック
 	auto ls = pad.GetPadLStick(InputManager::JOYPAD_NO::PAD1, 0.20f, false);
 	moveX += ls.x * MOVE_SPEED;
 	moveY += ls.y * MOVE_SPEED;
 
-    // ───────────────
-    // 移動
-    playerPos.x += moveX;
-    playerPos.y += moveY;
+	//十字キー(D-Pad)
+	{
+		auto dpad = pad.GetPadDPad(InputManager::JOYPAD_NO::PAD1);
+		if (dpad.up)    moveY -= MOVE_SPEED;
+		if (dpad.down)  moveY += MOVE_SPEED;
+		if (dpad.left)  moveX -= MOVE_SPEED;
+		if (dpad.right) moveX += MOVE_SPEED;
+	}
+
+	// ───────────────
+	// 移動
+	playerPos.x += moveX;
+	playerPos.y += moveY;
 
     // 画面端補正
     if (playerPos.x < PLAYER_WID / 2) playerPos.x = PLAYER_WID / 2;
