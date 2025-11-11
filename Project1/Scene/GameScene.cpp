@@ -1,5 +1,7 @@
 // GameScene class
 #include <DxLib.h>
+#include <cmath>
+
 #include "GameScene.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
@@ -95,24 +97,73 @@ void GameScene::Update(void)
 		bullets.push_back(newBullet);
 	}
 	// 回転弾の発射
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
 	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
 		Vector2 pos = player->GetPlayerPos();
-		b->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
-		bullets.push_back(b);
+
+		constexpr int   N = 5;      // 発射数
+		const     float radius = 80.0f;  // 半径
+		const     float omega = 0.1f;   // 角速度(ラジアン/フレーム)
+		const     int   life = 600;    // 寿命(フレーム)
+		const     float TWO_PI = 6.28318530718f;
+
+		for (int i = 0; i < N; ++i)
+		{
+			Bullet* b = new Bullet(this);
+			b->SystemInit();
+			b->GameInit();
+
+			// まず通常の回転弾として生成
+			b->CreateOrbit({ static_cast<float>(pos.x), static_cast<float>(pos.y) },
+				radius, omega, life);
+
+			// 各弾の初期角度をずらす（72°刻み）
+			b->angle = (TWO_PI / N) * i;
+
+			// その角度に合わせて初期位置も再配置して重なり回避
+			b->bPos.x = static_cast<float>(pos.x) + std::cos(b->angle) * radius;
+			b->bPos.y = static_cast<float>(pos.y) + std::sin(b->angle) * radius;
+
+			bullets.push_back(b);
+		}
 	}
 
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1))
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Q))
 	{
-		Bullet* b = new Bullet(this);
-		b->SystemInit();
-		b->GameInit();
 		Vector2 pos = player->GetPlayerPos();
-		b->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
-		bullets.push_back(b);
+
+		// 扇の設定
+		constexpr int   N = 10;                  // 発射数
+		constexpr float SPREAD = 3.1415926535f / 3;  // 総扇角＝60度
+		constexpr int   LIFE = 600;                // 寿命（回転弾と揃え）
+		const float     HALF = SPREAD * 0.5f;
+
+		// プレイヤー向き → 基準角（スクリーン座標の上下左右）
+		float baseAngle = 0.0f;
+		switch (player->GetPlayerDir()) {
+		case AsoUtility::DIRECTION::E_DIR_RIGHT: baseAngle = 0.0f;                      break;
+		case AsoUtility::DIRECTION::E_DIR_LEFT:  baseAngle = 3.1415926535f;             break; // π
+		case AsoUtility::DIRECTION::E_DIR_DOWN:  baseAngle = 3.1415926535f * 0.5f;      break; // +π/2
+		case AsoUtility::DIRECTION::E_DIR_UP:    baseAngle = -3.1415926535f * 0.5f;     break; // -π/2
+		default: break;
+		}
+
+		// 角度間隔：N本を等間隔で配置
+		const float step = (N > 1) ? (SPREAD / (N - 1)) : 0.0f;
+
+		for (int i = 0; i < N; ++i)
+		{
+			const float ang = baseAngle - HALF + step * i;
+
+			Bullet* b = new Bullet(this);
+			b->SystemInit();
+			b->GameInit();
+
+			// 任意角度で直進する通常弾を生成
+			b->CreateAngle({ static_cast<float>(pos.x), static_cast<float>(pos.y) }, ang, LIFE);
+
+			bullets.push_back(b);
+		}
 	}
 
 	// 弾の更新
@@ -436,6 +487,8 @@ void GameScene::CollisionCheck(void)
 	Vector2 pPos = player->GetPlayerPos();
 	Vector2 pSize = { Player::PLAYER_WID, Player::PLAYER_HIG };
 
+	std::vector<Bullet*> spawnQueue;
+
 	// 敵の数だけチェック
 	for (auto& e : enemys) {
 		if (!e->GetAlive()) continue;
@@ -449,7 +502,31 @@ void GameScene::CollisionCheck(void)
 			Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
 
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
-				e->SetDamege(4);
+				e->SetDamege(1);
+				//命中位置から小拡散弾を準備（8方向）
+				const int   SHARD_COUNT = 8;
+				const float TWO_PI = 6.28318530718f;
+				const float STEP = TWO_PI / SHARD_COUNT;
+				const int   SHARD_LIFE = 25;   // 短寿命
+
+				for (int i = 0; i < SHARD_COUNT; ++i) {
+					const float ang = STEP * i;
+
+					Bullet* nb = new Bullet(this);
+					nb->SystemInit();
+					nb->GameInit();
+
+					//任意角度直進を使
+					nb->CreateAngle(
+						{ static_cast<float>(bPos.x), static_cast<float>(bPos.y) },
+						ang,
+						SHARD_LIFE
+					);
+
+					spawnQueue.push_back(nb);
+				}
+
+				// 元の弾は爆発
 				b->BlastOn(b->GetBulletPos());
 			}
 		}
@@ -461,6 +538,10 @@ void GameScene::CollisionCheck(void)
 		}
 
 		if (!player->GetAlive()) break;
+	}
+	// 最後にまとめて追加
+	if (!spawnQueue.empty()) {
+		bullets.insert(bullets.end(), spawnQueue.begin(), spawnQueue.end());
 	}
 }
 

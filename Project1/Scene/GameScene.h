@@ -19,7 +19,7 @@ public:
     static constexpr int SCROLL_AREA_HIG = 100;
 
     // エンカウント(値が大きいと出現する間隔が長くなる）
-    static constexpr int ENCOUNT = 20;
+    static constexpr int ENCOUNT = 2000;
 
     GameScene(void);
     ~GameScene(void);

@@ -63,6 +63,8 @@ public:
 
 	void CreateRain(Vector2F center, float rad, float speed, int time);
 
+	void CreateAngle(Vector2F pos, float angleRad, int life = ALIVE_TIME);
+
 	// ‰~‰^“®—p
 	bool isOrbit = false;         // ‰~‰^“®’†‚©‚Ç‚¤‚©
 

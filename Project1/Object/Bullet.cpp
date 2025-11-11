@@ -280,3 +280,15 @@ void Bullet::CreateRain(Vector2F center, float rad, float speed, int time)
 	ChangeStatus(STATUS::E_STAT_MOVE);
 
 }
+
+void Bullet::CreateAngle(Vector2F pos, float angleRad, int life)
+{
+	aliveCounter = life;
+	bPos = pos;
+	// 角度 → 単位ベクトル
+	bVec.x = cosf(angleRad);
+	bVec.y = sinf(angleRad);
+
+	bulletType = BulletType::NORMAL; // 直進弾として扱う
+	ChangeStatus(STATUS::E_STAT_MOVE);
+}
