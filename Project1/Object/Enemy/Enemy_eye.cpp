@@ -1,0 +1,14 @@
+#include <DxLib.h>
+
+#include"Enemy_eye.h"
+
+void Eenmy_eye::SetEnemyParam(void)
+{
+	// 敵の画像ファイル名
+	imgFName += "Enemy_eye.png";
+	// 敵の画像サイズ
+	size = { 64, 64 };
+	// 敵の移動速度
+	speed = 2.0f;
+	hp = hpMax = 3;
+}

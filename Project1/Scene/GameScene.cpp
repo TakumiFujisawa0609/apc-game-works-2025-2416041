@@ -1,26 +1,24 @@
-
 // GameScene class
 #include <DxLib.h>
 #include "GameScene.h"
 #include "../Application.h"
 #include "../Scene/Stage/Stage_1.h"
+
 #include "../Object/Player.h"
 #include "../Object/Bullet.h"
-#include "../Object/Enemy.h"
-#include "../Object/Enemynormal.h"
+#include "../Object/Enemy/Enemy.h"
+#include "../Object/Enemy/Enemynormal.h"
+#include "../Object/Enemy/Enemy_eye.h"
+#include "../Object/Enemy/Enemy_GoblinRun.h"
+#include "../Object/Enemy/Enemy_Mushroom.h"
+#include "../Object/Enemy/Enemy_Skeleton.h"
+
 #include "../Manager/InputManager.h"
-//#include "EnemyDragon.h"
-//#include "EnemyFly.h"
-//#include "EnemyFire.h"
-//#include "EnemyLizardSmall.h"
-//#include "EnemyLizardBig.h"
-//#include "EnemyBoss.h"
 
 GameScene::GameScene(void)
 {
 	stage = nullptr;
 	player = nullptr;
-	
 }
 
 GameScene::~GameScene(void)
@@ -39,9 +37,12 @@ bool GameScene::SystemInit(void)
 	if (stage->SystemInit() == -1) return false;
 	player->SystemInit();
 
-	// íeä«óùÇçÏÇÈ
-	bulletManager = new BulletManager(this);
-	if (!bulletManager->SystemInit()) return false;
+	// íeÇÃã§í ÉäÉ\Å[ÉXì«Ç›çûÇ›ÅiâÊëúÇ»Ç«Åj 
+	Bullet* tmp = new Bullet(this);
+	if (!tmp->SystemInit()) return false;
+	delete tmp;
+	//å¬ï íeÇÕ Update() Ç≈ê∂ê¨ 
+	bullets.clear();
 
 	return true;
 }
@@ -52,9 +53,13 @@ void GameScene::GameInit(void)
 	stage->GameInit();
 	player->GameInit();
 
-	if (bulletManager)
-		bulletManager->GameInit();
+	// íeÇÃèâä˙âª
+	for (auto& b : bullets) { // Ç‡Çµä˘Ç…écÇ¡ÇƒÇ¢ÇÈíeÇ™Ç†ÇÍÇŒçÌèú
+		b->Release();
+		delete b;
+	}
 
+	bullets.clear();
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
 	nextSceneID = E_SCENE_GAME;
@@ -74,38 +79,46 @@ void GameScene::Update(void)
 	static int shotTimer = 0;
 	const int SHOT_INTERVAL = 30;
 
-	// í èÌíe
+	// íeÇÃî≠éÀ
 	shotTimer++;
-	if (shotTimer >= SHOT_INTERVAL) {
+	if (shotTimer >= SHOT_INTERVAL)
+	{
 		shotTimer = 0;
+		Bullet* newBullet = new Bullet(this);
+		newBullet->SystemInit();
+		newBullet->GameInit();
+
 		Vector2 pos = player->GetPlayerPos();
-		Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
-		Vector2F dir;
-		switch (player->GetPlayerDir()) {
-		case AsoUtility::DIRECTION::E_DIR_UP:    dir = { 0.0f, -1.0f }; break;
-		case AsoUtility::DIRECTION::E_DIR_DOWN:  dir = { 0.0f,  1.0f }; break;
-		case AsoUtility::DIRECTION::E_DIR_LEFT:  dir = { -1.0f, 0.0f }; break;
-		case AsoUtility::DIRECTION::E_DIR_RIGHT: dir = { 1.0f,  0.0f }; break;
-		}
-		bulletManager->CreateNormal(posF, dir);
+		Vector2F posF(static_cast<float>(pos.x),
+			static_cast<float>(pos.y));
+		newBullet->Create(posF, player->GetPlayerDir());
+		bullets.push_back(newBullet);
+	}
+	// âÒì]íeÇÃî≠éÀ
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z))
+	{
+		Bullet* b = new Bullet(this);
+		b->SystemInit();
+		b->GameInit();
+		Vector2 pos = player->GetPlayerPos();
+		b->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
+		bullets.push_back(b);
 	}
 
-	// ORBITíe
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_Z)) {
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1))
+	{
+		Bullet* b = new Bullet(this);
+		b->SystemInit();
+		b->GameInit();
 		Vector2 pos = player->GetPlayerPos();
-		bulletManager->CreateOrbit({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
+		b->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
+		bullets.push_back(b);
 	}
 
-	// RAINíe
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_1)) {
-		Vector2 pos = player->GetPlayerPos();
-		bulletManager->CreateRain({ float(pos.x), float(pos.y) }, 80.0f, 0.1f, 600);
+	// íeÇÃçXêV
+	for (auto& b : bullets) {
+		b->Update();
 	}
-
-
-	
-	if (bulletManager)
-		bulletManager->Update();
 
 	// èIóπÇµÇΩíeÇçÌèú
 	bullets.erase(
@@ -138,29 +151,24 @@ void GameScene::Update(void)
 		// ÉâÉìÉ_ÉÄÇ…éÌï ÇåàÇﬂÇÈ
 		int rr = GetRand(static_cast<int>(Enemy::ENEMY_TYPE::E_TYPE_MAX) - 1);
 		Enemy::ENEMY_TYPE rType = static_cast<Enemy::ENEMY_TYPE>(rr);
+
 		// éÌï Ç…ëŒâûÇµÇΩîhê∂ÉNÉâÉXÇÃÉCÉìÉXÉ^ÉìÉXÇê∂ê¨
 		switch (rType) {
 		case Enemy::ENEMY_TYPE::E_TYPE_NORMAL:
-		e = new Enemynormal();
+			e = new Enemynormal();
 			break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_FLY:
-		//	e = new EnemyFly();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_FIRE:
-		//	e = new EnemyFire();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_LIZARD_SMALL:
-		//	e = new EnemyLizardSmall();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_LIZARD_BIG:
-		//	e = new EnemyLizardBig();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_DRAGON:
-		//	e = new EnemyDragon();
-		//	break;
-		//case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS:
-		//	e = new EnemyBoss();
-		//	break;
+		case Enemy::ENEMY_TYPE::E_TYPE_EYE:
+			e = new Eenmy_eye();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
+			e = new Enemy_GoblinRun();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_MUSHROOM:
+			e = new Enemy_Mushroom();
+			break;
+		case Enemy::ENEMY_TYPE::E_TYPE_SKELETON:
+			e = new Enemy_Skeleton();
+			break;
 		}
 
 		if (e != nullptr) {
@@ -235,7 +243,7 @@ void GameScene::Update(void)
 		EraseEnemys();
 		nextSceneID = E_SCENE_GAMEOVER;
 	}
-	
+
 
 }
 
@@ -249,9 +257,8 @@ void GameScene::Draw(void)
 	for (int ii = 0; ii < size; ii++) {
 		enemys[ii]->Draw();
 	}
-	
-	if (bulletManager)
-		bulletManager->Draw();
+
+	for (auto& b : bullets) b->Draw();
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	int php = player->GetHp();
@@ -280,11 +287,7 @@ bool GameScene::Release(void)
 {
 	EraseEnemys();
 
-	if (bulletManager) {
-		bulletManager->Release();
-		delete bulletManager;
-		bulletManager = nullptr;
-	}
+	for (auto& b : bullets) { b->Release(); delete b; }
 
 	player->Release();
 	delete player;
