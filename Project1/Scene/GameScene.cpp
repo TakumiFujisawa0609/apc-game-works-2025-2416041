@@ -525,7 +525,7 @@ void GameScene::CollisionCheck(void)
 				if (!e->IsInvincible()) {
 					e->SetDamege(1);
 					////–½’†ˆÊ’u‚©‚ç¬ŠgU’e‚ğ€”õi8•ûŒüj
-					const int   SHARD_COUNT = 3;
+					const int   SHARD_COUNT = 6;
 					const float TWO_PI = 6.28318530718f;
 					const float STEP = TWO_PI / SHARD_COUNT;
 					const int   SHARD_LIFE = 25;   // ’Zõ–½
