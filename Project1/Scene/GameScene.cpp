@@ -19,8 +19,8 @@
 
 GameScene::GameScene(void)
 {
-	stage = nullptr;
-	player = nullptr;
+	stage_ = nullptr;
+	player_ = nullptr;
 }
 
 GameScene::~GameScene(void)
@@ -30,14 +30,14 @@ GameScene::~GameScene(void)
 // 初期化処理(最初の１回のみ実行)
 bool GameScene::SystemInit(void)
 {
-	stage = new StageBase();
-	if (!stage) return false;
+	stage_ = new StageBase();
+	if (!stage_) return false;
 
-	player = new Player(this);
-	if (!player) return false;
+	player_ = new Player(this);
+	if (!player_) return false;
 
-	if (stage->SystemInit() == -1) return false;
-	player->SystemInit();
+	if (stage_->SystemInit() == -1) return false;
+	player_->SystemInit();
 
 	// 弾の共通リソース読み込み（画像など） 
 	Bullet* tmp = new Bullet(this);
@@ -52,8 +52,8 @@ bool GameScene::SystemInit(void)
 // ゲーム起動・再開時に必ず呼び出す処理
 void GameScene::GameInit(void)
 {
-	stage->GameInit();
-	player->GameInit();
+	stage_->GameInit();
+	player_->GameInit();
 
 	// 弾の初期化
 	for (auto& b : bullets) { // もし既に残っている弾があれば削除
@@ -73,6 +73,8 @@ void GameScene::GameInit(void)
 	autoShotTimer_ = 0;
 	autoOrbitTimer_ = 0;
 	autoFanTimer_ = 0;
+
+	slot_.Init();
 }
 
 // 更新処理
@@ -81,9 +83,18 @@ void GameScene::Update(void)
 	
 	InputManager::GetInstance().Update();
 
-	Vector2 oldPos = player->GetPlayerPos(); // 移動前のプレイヤーの位置
-	stage->Update();
-	player->Update();
+	if (CheckHitKey(KEY_INPUT_J)) {
+		if (!slot_.IsSpinning()) {
+			slot_.Start();
+		}
+		
+	}
+
+	slot_.Update();
+
+	Vector2 oldPos = player_->GetPlayerPos(); // 移動前のプレイヤーの位置
+	stage_->Update();
+	player_->Update();
 
 	static int shotTimer = 0;
 	const int SHOT_INTERVAL = 30;
@@ -104,9 +115,9 @@ void GameScene::Update(void)
 			newBullet->SystemInit();
 			newBullet->GameInit();
 
-			Vector2 pos = player->GetPlayerPos();
+			Vector2 pos = player_->GetPlayerPos();
 			Vector2F posF(static_cast<float>(pos.x), static_cast<float>(pos.y));
-			newBullet->Create(posF, player->GetPlayerDir()); // 既存API
+			newBullet->Create(posF, player_->GetPlayerDir()); // 既存API
 			bullets.push_back(newBullet);
 		}
 	}
@@ -118,7 +129,7 @@ void GameScene::Update(void)
 		{
 			autoOrbitTimer_ = 0;
 
-			Vector2 pos = player->GetPlayerPos();
+			Vector2 pos = player_->GetPlayerPos();
 
 			constexpr int   N = 4;
 			const     float radius = 80.0f;
@@ -151,7 +162,7 @@ void GameScene::Update(void)
 		{
 			autoFanTimer_ = 0;
 
-			Vector2 pos = player->GetPlayerPos();
+			Vector2 pos = player_->GetPlayerPos();
 
 			constexpr int   N = 3;                         // 本数
 			constexpr float SPREAD = 3.1415926535f / 3.0f;       // 60度
@@ -160,7 +171,7 @@ void GameScene::Update(void)
 
 			// プレイヤー向き
 			float baseAngle = 0.0f;
-			switch (player->GetPlayerDir()) {
+			switch (player_->GetPlayerDir()) {
 			case AsoUtility::DIRECTION::E_DIR_RIGHT: baseAngle = 0.0f;                      break;
 			case AsoUtility::DIRECTION::E_DIR_LEFT:  baseAngle = 3.1415926535f;             break;
 			case AsoUtility::DIRECTION::E_DIR_DOWN:  baseAngle = 3.1415926535f * 0.5f;      break;
@@ -213,7 +224,7 @@ void GameScene::Update(void)
 	}
 
 	// エンカウンター
-	if (stage->GetMapType() == StageBase::MAP_TYPE::E_MIYPE_GROUND)enCounter++;
+	if (stage_->GetMapType() == StageBase::MAP_TYPE::E_MIYPE_GROUND)enCounter++;
 	if (enCounter > ENCOUNT) {
 
 		// 敵の生成
@@ -250,8 +261,8 @@ void GameScene::Update(void)
 			enCounter = 0; // エンカウンターをリセット
 		}
 	}
-	Vector2 playerPos = player->GetPlayerPos(); // 移動後のプレイヤーの位置
-	AsoUtility::DIRECTION pdir = player->GetPlayerDir(); // 移動方向を取得
+	Vector2 playerPos = player_->GetPlayerPos(); // 移動後のプレイヤーの位置
+	AsoUtility::DIRECTION pdir = player_->GetPlayerDir(); // 移動方向を取得
 
 	if (pdir == AsoUtility::DIRECTION::E_DIR_DOWN) {
 		// 下移動の場合のみプレイヤーのY座標を画像の下端に設定する
@@ -266,7 +277,7 @@ void GameScene::Update(void)
 	//		Vector2 mp = WorldPos2MapPos(playerPos);
 	//		oldPos.y = Stage::MAP_CHIP_SIZE_HIG * mp.y - (Player::PLAYER_HIG / 2) - 1;
 	//	}
-		player->SetPlayerPos(oldPos);
+		player_->SetPlayerPos(oldPos);
 	}
 	else {
 		if (pdir == AsoUtility::DIRECTION::E_DIR_LEFT || pdir == AsoUtility::DIRECTION::E_DIR_RIGHT) {
@@ -275,7 +286,7 @@ void GameScene::Update(void)
 			wPos.y += (Player::PLAYER_HIG / 2);
 			if (IsCollisionStage(wPos)) {
 				// 足元が衝突対象地形にかかっているので、移動不可として元の位置にプレイヤーを戻す。
-				player->SetPlayerPos(oldPos);
+				player_->SetPlayerPos(oldPos);
 			}
 		}
 	}
@@ -296,7 +307,7 @@ void GameScene::Update(void)
 
 	// 衝突判定
 	CollisionCheck();
-	if (player->GetAlive()) {
+	if (player_->GetAlive()) {
 		// 死亡した敵データを消去する
 		for (int ii = (int)size; ii > 0; ii--) {
 			if (!enemys[ii - 1]->GetAlive()) {
@@ -321,8 +332,8 @@ void GameScene::Update(void)
 // 描画処理
 void GameScene::Draw(void)
 {
-	stage->Draw();
-	player->Draw();
+	stage_->Draw();
+	player_->Draw();
 	// 敵の描画
 	size_t size = enemys.size();
 	for (int ii = 0; ii < size; ii++) {
@@ -332,7 +343,7 @@ void GameScene::Draw(void)
 	for (auto& b : bullets) b->Draw();
 
 	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
-	int php = player->GetHp();
+	int php = player_->GetHp();
 	// 残り時間を表示
 	int elapsed = GetNowCount() - startTime;
 	int remain = max(0, limitTime - elapsed);
@@ -340,7 +351,7 @@ void GameScene::Draw(void)
 		"残り時間：%.2f秒", remain / 1000.0f);
 	//-----------------------------------------------------------------------
 	// デバッグ用
-	Vector2 pPos = player->GetPlayerPos();
+	Vector2 pPos = player_->GetPlayerPos();
 	Vector2 mPos = WorldPos2MapPos(pPos);
 	DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "プレイヤー座標：(%d, %d)→(%d, %d)",
 		pPos.x, pPos.y, mPos.x, mPos.y);
@@ -351,6 +362,8 @@ void GameScene::Draw(void)
 	DrawBox(SCROLL_AREA_WID, SCROLL_AREA_HIG,
 		Application::SCREEN_SIZE_WID - SCROLL_AREA_WID, Application::SCREEN_SIZE_HIG - SCROLL_AREA_HIG,
 		GetColor(0, 0, 255), false);
+
+	slot_.Draw();
 }
 
 // 解放処理(最後の１回のみ実行)
@@ -360,21 +373,23 @@ bool GameScene::Release(void)
 
 	for (auto& b : bullets) { b->Release(); delete b; }
 
-	player->Release();
-	delete player;
-	player = nullptr;
+	player_->Release();
+	delete player_;
+	player_ = nullptr;
 
-	stage->Release();
-	delete stage;
-	stage = nullptr;
+	stage_->Release();
+	delete stage_;
+	stage_ = nullptr;
+
+	
 
 	return true;
 }
 
 void GameScene::MapScrollProc(void)
 {
-	Vector2 mapStPos = stage->GetMapDispStPos();
-	Vector2 playerPos = player->GetPlayerPos();
+	Vector2 mapStPos = stage_->GetMapDispStPos();
+	Vector2 playerPos = player_->GetPlayerPos();
 	// 現在のマップの端のマップ座標ではなく、ワールド座標を求める
 	int leftEdge = mapStPos.x * StageBase::MAP_CHIP_SIZE_WID;
 	int rightEdge = mapStPos.x * StageBase::MAP_CHIP_SIZE_WID + Application::SCREEN_SIZE_WID - 1;
@@ -388,7 +403,7 @@ void GameScene::MapScrollProc(void)
 		dx /= StageBase::MAP_CHIP_SIZE_WID;
 		dx -= mapStPos.x;
 		if (dx < 0)dx *= -1;
-		stage->MoveMapToRight(dx);
+		stage_->MoveMapToRight(dx);
 	}
 
 	// 画面左端のマップチップ座標内に達しているか調べる
@@ -398,7 +413,7 @@ void GameScene::MapScrollProc(void)
 		dx /= StageBase::MAP_CHIP_SIZE_WID;
 		dx -= mapStPos.x;
 		if (dx < 0)dx *= -1;
-		stage->MoveMapToLeft(dx);
+		stage_->MoveMapToLeft(dx);
 	}
 
 	// 画面上端のマップチップ座標内に達しているか調べる
@@ -408,7 +423,7 @@ void GameScene::MapScrollProc(void)
 		dy /= StageBase::MAP_CHIP_SIZE_HIG;
 		dy -= mapStPos.y;
 		if (dy < 0)dy *= -1;
-		stage->MoveMapToUpper(dy);
+		stage_->MoveMapToUpper(dy);
 	}
 
 	// 画面下端のマップチップ座標内に達しているか調べる
@@ -418,7 +433,7 @@ void GameScene::MapScrollProc(void)
 		dy /= StageBase::MAP_CHIP_SIZE_HIG;
 		dy -= mapStPos.y;
 		if (dy < 0)dy *= -1;
-		stage->MoveMapToDown(dy);
+		stage_->MoveMapToDown(dy);
 	}
 }
 
@@ -488,7 +503,7 @@ bool GameScene::IsCollisionStage(Vector2 worldPos)
 		return true;
 	}
 	Vector2 mpos = WorldPos2MapPos(worldPos);
-	int chipNo = stage->GetMapChipNo(mpos);
+	int chipNo = stage_->GetMapChipNo(mpos);
 	bool rb = chipCollisionInfoTbl[chipNo];
 	return rb;
 }
@@ -504,7 +519,7 @@ bool GameScene::IsCollisionStage(Vector2 worldPos)
  */
 void GameScene::CollisionCheck(void)
 {
-	Vector2 pPos = player->GetPlayerPos();
+	Vector2 pPos = player_->GetPlayerPos();
 	Vector2 pSize = { Player::PLAYER_WID, Player::PLAYER_HIG };
 
 	std::vector<Bullet*> spawnQueue;
@@ -557,10 +572,10 @@ void GameScene::CollisionCheck(void)
 		// プレイヤーとの衝突判定
 		if (!e->GetAlive()) continue;
 		if (CollisionCheckRectCenter(pPos, pSize, ePos, eSize)) {
-			player->SetDamage(1);
+			player_->SetDamage(1);
 		}
 
-		if (!player->GetAlive()) break;
+		if (!player_->GetAlive()) break;
 	}
 	// 最後にまとめて追加
 	if (!spawnQueue.empty()) {

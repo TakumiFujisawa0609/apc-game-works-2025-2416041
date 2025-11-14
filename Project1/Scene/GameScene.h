@@ -4,6 +4,8 @@
 #include <list>
 #include "../Common/Vector2.h"
 #include "../StDefineData.h"
+#include "../Object/Slot.h"
+
 
 
 class StageBase;
@@ -30,18 +32,17 @@ public:
     void Draw(void);       // 描画処理
     bool Release(void);    // 解放処理(最後の１回のみ実行)
 
-    StageBase* GetLpStage(void) { return stage; }
-    Player* GetLpPlayer(void) { return player; }
+    StageBase* GetLpStage(void) { return stage_; }
+    Player* GetLpPlayer(void) { return player_; }
 
     E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
    
 
 private:
-    StageBase* stage;  // Stageクラスのインスタンスのポインタ
-    Player* player;    // Playerクラスのインスタンスのポインタ
-   
-
+    StageBase* stage_;  // Stageクラスのインスタンスのポインタ
+    Player* player_;    // Playerクラスのインスタンスのポインタ
+	
     // 複数に変更！
     std::vector<Bullet*> bullets; // Bulletクラスのインスタンスを複数管理
 
@@ -61,6 +62,8 @@ private:
     int autoShotTimer_;
     int autoOrbitTimer_;
     int autoFanTimer_;
+
+	Slot slot_; // スロット
 
     // シーン遷移ID
     E_SCENE_ID nextSceneID;
