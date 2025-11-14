@@ -153,7 +153,7 @@ void GameScene::Update(void)
 
 			Vector2 pos = player->GetPlayerPos();
 
-			constexpr int   N = 6;                         // 本数
+			constexpr int   N = 3;                         // 本数
 			constexpr float SPREAD = 3.1415926535f / 3.0f;       // 60度
 			constexpr int   LIFE = 600;                        // 寿命
 			const     float HALF = SPREAD * 0.5f;
@@ -524,8 +524,8 @@ void GameScene::CollisionCheck(void)
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
 				if (!e->IsInvincible()) {
 					e->SetDamege(1);
-					////命中位置から小拡散弾を準備（8方向）
-					const int   SHARD_COUNT = 6;
+					////命中位置から小拡散弾を準備（デフォは4方向）
+					const int   SHARD_COUNT = 4;
 					const float TWO_PI = 6.28318530718f;
 					const float STEP = TWO_PI / SHARD_COUNT;
 					const int   SHARD_LIFE = 25;   // 短寿命
