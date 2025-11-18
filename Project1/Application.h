@@ -25,12 +25,13 @@ public:
 	static const std::string PATH_DATA;
 	static const std::string PATH_OBJECT;
 	static const std::string PATH_WEAPON;
+	static const std::string PATH_SLOT;
 	static const std::string PATH_SCENE;
 	static const std::string PATH_STAGE;
 	static const std::string PATH_UI;
 	static const std::string PATH_IMAGE;
 	static const std::string PATH_SOUND;
-	static const std::string PATH_MOVIE; // 動画のパス（必要なら追加）
+	static const std::string PATH_MOVIE; // 動画のパス（必要なら追加)
 	//static const std::string PATH_EFFECT;
 	//static const std::string PATH_MAP_DATA;
 	//------------------------------------------

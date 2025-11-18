@@ -65,6 +65,9 @@ private:
 
 	Slot slot_; // スロット
 
+    int  defeatedEnemyCount_;
+    bool slotStarted_;
+
     // シーン遷移ID
     E_SCENE_ID nextSceneID;
 

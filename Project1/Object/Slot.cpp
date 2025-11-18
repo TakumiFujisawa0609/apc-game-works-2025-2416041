@@ -9,6 +9,10 @@ Slot::Slot()
     , isBigHit_(false)
 {
     result_.fill(0);
+
+    for (int i = 0; i < SYMBOL_COUNT; ++i) {
+        symbolImg_[i] = -1;
+    }
 }
 
 Slot::~Slot()
@@ -17,8 +21,6 @@ Slot::~Slot()
 
 void Slot::Init()
 {
-    // 乱数はどこかで一度だけでいいので、
-    // もし全体でやっていなければここで呼んでもOK
     // SetRandSeed( /* 適当な値 */ );
 
     state_ = State::Idle;
@@ -27,11 +29,6 @@ void Slot::Init()
     isSmallHit_ = false;
     isBigHit_ = false;
     result_.fill(0);
-}
-
-void Slot::Relese()
-{
-    // 今のところ読み込んでいる画像などはないので何もしない
 }
 
 void Slot::Start()
@@ -89,7 +86,7 @@ void Slot::Update()
 void Slot::Draw()
 {
     // 簡易表示（あとで画像に差し替えてOK）
-    // 位置は適当に調整してね
+    // 位置は適当に調整
     const int x = 100;
     const int y = 100;
     const unsigned int colWhite = GetColor(255, 255, 255);
@@ -133,7 +130,12 @@ void Slot::Draw()
         DrawString(x, y + 80, "KAKUHEN MODE", colYellow);
     }
 }
+void Slot::Relese()
+{
 
+
+
+}
 bool Slot::IsSpinning() const
 {
     return state_ == State::Spinning;

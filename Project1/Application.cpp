@@ -7,6 +7,7 @@
 const std::string Application::PATH_DATA = "Data/";
 const std::string Application::PATH_OBJECT = PATH_DATA + "object/";
 const std::string Application::PATH_WEAPON = PATH_OBJECT + "weapon/";
+const std::string Application::PATH_SLOT = PATH_OBJECT + "slot/";
 const std::string Application::PATH_SCENE = PATH_DATA + "Scene/";
 const std::string Application::PATH_STAGE = PATH_DATA + "Stage/";
 const std::string Application::PATH_UI = PATH_DATA + "UI/";

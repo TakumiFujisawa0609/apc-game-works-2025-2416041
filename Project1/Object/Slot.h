@@ -61,6 +61,12 @@ private:
     static constexpr int SYMBOL_COUNT = 4; // シンボルの種類数（0?3）
     static constexpr int SPIN_DURATION = 60; // 何フレーム回すか
 
+    // 描画用（シンボル画像サイズと間隔）
+    static constexpr int SYMBOL_W = 64;  // 画像幅（実際の画像に合わせて調整）
+    static constexpr int SYMBOL_H = 64;  // 画像高さ
+    static constexpr int SYMBOL_MARGIN = 8; // リール間の隙間
+
+
     State state_;
     Mode  mode_;
 
@@ -70,5 +76,8 @@ private:
 
     bool isSmallHit_;
     bool isBigHit_;
+
+    // シンボルごとの画像ハンドル
+    int symbolImg_[SYMBOL_COUNT];
 };
 

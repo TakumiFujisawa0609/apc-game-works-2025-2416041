@@ -75,6 +75,9 @@ void GameScene::GameInit(void)
 	autoFanTimer_ = 0;
 
 	slot_.Init();
+
+	defeatedEnemyCount_ = 0;
+	slotStarted_ = false;
 }
 
 // 更新処理
@@ -83,12 +86,12 @@ void GameScene::Update(void)
 	
 	InputManager::GetInstance().Update();
 
-	if (CheckHitKey(KEY_INPUT_J)) {
+	/*if (CheckHitKey(KEY_INPUT_J)) {
 		if (!slot_.IsSpinning()) {
 			slot_.Start();
 		}
 		
-	}
+	}*/
 
 	slot_.Update();
 
@@ -311,13 +314,21 @@ void GameScene::Update(void)
 		// 死亡した敵データを消去する
 		for (int ii = (int)size; ii > 0; ii--) {
 			if (!enemys[ii - 1]->GetAlive()) {
+
+				defeatedEnemyCount_++;
+
 				enemys[ii - 1]->Release();
 				delete enemys[ii - 1];
+
 				//std::vector<Enemy*>::iterator itr;
 				std::vector<Enemy*>::iterator itr;
 				itr = enemys.begin() + (ii - 1);
 				enemys.erase(itr);
 			}
+		}
+		// 10体倒したらスロット開始 
+		if (defeatedEnemyCount_ > 0 && defeatedEnemyCount_ % 10 == 0) {
+			if (!slot_.IsSpinning()) slot_.Start();
 		}
 	}
 	else {
