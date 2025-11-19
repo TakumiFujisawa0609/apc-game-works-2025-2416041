@@ -48,8 +48,8 @@ private:
     // 通常 or 確変
     enum class Mode
     {
-        Normal,
-        Kakuhen,
+		Normal,    // 通常
+		Kakuhen,   // 確変
     };
 
     // 内部処理
@@ -74,8 +74,12 @@ private:
 
     int spinTimer_;    // 何フレーム回っているか
 
-    bool isSmallHit_;
-    bool isBigHit_;
+    bool isSmallHit_;//小当たり
+	bool isBigHit_;//大当たり
+
+    bool isVisible_;// 表示中か？
+    int  resultTimer_;// 結果表示用タイマー
+    static constexpr int RESULT_DISPLAY_TIME = 180; // 約3秒
 
     // シンボルごとの画像ハンドル
     int symbolImg_[SYMBOL_COUNT];
