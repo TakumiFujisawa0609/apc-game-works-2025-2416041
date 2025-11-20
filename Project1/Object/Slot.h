@@ -90,6 +90,10 @@ private:
     int  resultTimer_;// 結果表示用タイマー
     static constexpr int RESULT_DISPLAY_TIME = 180; // 約3秒
 
+    //確変の残りゲーム数
+    int kakuhenGamesLeft_;
+    static constexpr int KAKUHEN_GAME_MAX = 3;
+
     // シンボルごとの画像ハンドル
     int symbolImg_[SYMBOL_COUNT];
 

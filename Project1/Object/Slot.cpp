@@ -12,6 +12,7 @@ Slot::Slot()
     , resultTimer_(0)
     , lastHitType_(HitType::None)
     , hitUsed_(true) 
+    , kakuhenGamesLeft_(0)
 {
     result_.fill(0);
 
@@ -54,6 +55,7 @@ void Slot::Init()
     lastHitType_ = HitType::None;
     hitUsed_ = true;
 
+    kakuhenGamesLeft_ = 0;   //確変残りゲーム数リセット
 }
 
 void Slot::Start()
@@ -113,7 +115,22 @@ void Slot::Update()
     case State::Result:
         resultTimer_++;
         if (resultTimer_ >= RESULT_DISPLAY_TIME) {
-            //3秒経過したらスロットを非表示に
+            // タイマーリセット
+            resultTimer_ = 0;
+
+            // 確変中なら 1ゲーム消費
+            if (mode_ == Mode::Kakuhen) {
+                if (kakuhenGamesLeft_ > 0) {
+                    kakuhenGamesLeft_--;
+                }
+
+                // 0以下になったら確変終了
+                if (kakuhenGamesLeft_ <= 0) {
+                    mode_ = Mode::Normal;
+                }
+            }
+
+            // スロットを非表示にして待機へ
             isVisible_ = false;
             state_ = State::Idle;
         }
@@ -270,6 +287,8 @@ void Slot::JudgeHit()
 
         // 将来の確変のためのフラグ
         mode_ = Mode::Kakuhen;
+
+        kakuhenGamesLeft_ = KAKUHEN_GAME_MAX;
     }
     else if (a == b || b == c || a == c)
     {

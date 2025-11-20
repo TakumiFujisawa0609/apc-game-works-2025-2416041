@@ -131,7 +131,7 @@ void GameScene::Update(void)
 
 	// 直進の通常弾（一定間隔）
 	{
-		constexpr int SHOT_INTERVAL = 20; //30フレームごと
+		constexpr int SHOT_INTERVAL = 10; //30フレームごと
 		if (autoShotTimer_ >= SHOT_INTERVAL)
 		{
 			autoShotTimer_ = 0;
@@ -149,7 +149,7 @@ void GameScene::Update(void)
 
 	// 回転弾（5発同時を一定間隔）
 	{
-		constexpr int ORBIT_INTERVAL = 360; //60×秒
+		constexpr int ORBIT_INTERVAL = 240; //60×秒
 		if (autoOrbitTimer_ >= ORBIT_INTERVAL)
 		{
 			autoOrbitTimer_ = 0;
@@ -182,14 +182,14 @@ void GameScene::Update(void)
 
 	// 扇状弾（10発を一定間隔）
 	{
-		constexpr int FAN_INTERVAL = 70; //1.5秒
+		constexpr int FAN_INTERVAL = 60; //1.5秒
 		if (autoFanTimer_ >= FAN_INTERVAL)
 		{
 			autoFanTimer_ = 0;
 
 			Vector2 pos = player_->GetPlayerPos();
 
-			constexpr int   N = 3;                         // 本数
+			constexpr int   N = 5;                         // 本数
 			constexpr float SPREAD = 3.1415926535f / 3.0f;       // 60度
 			constexpr int   LIFE = 600;                        // 寿命
 			const     float HALF = SPREAD * 0.5f;
@@ -582,41 +582,54 @@ void GameScene::CollisionCheck(void)
 		Vector2 eSize = e->GetEnemySize();
 
 		// 弾との判定
+		 // 弾との判定
 		for (auto& b : bullets) {
 			if (!b->IsShotState()) continue;
 			Vector2 bPos = AsoUtility::Round(b->GetBulletPos());
 			Vector2 bSize = { Bullet::BULLET_SIZE_WID, Bullet::BULLET_SIZE_HIG };
 
 			if (CollisionCheckRectCenter(bPos, bSize, ePos, eSize)) {
+
 				if (!e->IsInvincible()) {
+					// この一撃で倒れたかどうかを判定するためのフラグ
+					bool killedByThisHit = false;
+
+					// ダメージ適用
 					e->SetDamege(1);
-					////命中位置から小拡散弾を準備（デフォは4方向）
-					const int   SHARD_COUNT = 4;
-					const float TWO_PI = 6.28318530718f;
-					const float STEP = TWO_PI / SHARD_COUNT;
-					const int   SHARD_LIFE = 25;   // 短寿命
 
-					for (int i = 0; i < SHARD_COUNT; ++i) {
-						const float ang = STEP * i;
-
-						Bullet* nb = new Bullet(this);
-						nb->SystemInit();
-						nb->GameInit();
-
-						//任意角度直進を使
-						nb->CreateAngle(
-							{ static_cast<float>(bPos.x), static_cast<float>(bPos.y) },
-							ang,
-							SHARD_LIFE
-						);
-
-					spawnQueue.push_back(nb);
+					// ダメージ適用後に生存フラグをチェック
+					if (!e->GetAlive()) {
+						killedByThisHit = true;
 					}
 
-					// 元の弾は爆発
+					//確変中かつこの弾で敵を倒したときだけ分裂弾を生成
+					if (killedByThisHit && slot_.IsInKakuhen()) {
+						const int   SHARD_COUNT = 4;
+						const float TWO_PI = 6.28318530718f;
+						const float STEP = TWO_PI / SHARD_COUNT;
+						const int   SHARD_LIFE = 25;   // 短寿命
+
+						for (int i = 0; i < SHARD_COUNT; ++i) {
+							const float ang = STEP * i;
+
+							Bullet* nb = new Bullet(this);
+							nb->SystemInit();
+							nb->GameInit();
+
+							// 任意角度直進弾として生成
+							nb->CreateAngle(
+								{ static_cast<float>(bPos.x), static_cast<float>(bPos.y) },
+								ang,
+								SHARD_LIFE
+							);
+
+							spawnQueue.push_back(nb);
+						}
+					}
+
+					// 元の弾は爆発（分裂しなくてもヒット演出は出す）
 					b->BlastOn(b->GetBulletPos());
 				}
-				
 			}
 		}
 

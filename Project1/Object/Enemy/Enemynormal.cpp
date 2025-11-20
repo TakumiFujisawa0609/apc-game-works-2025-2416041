@@ -8,7 +8,7 @@ void Enemynormal::SetEnemyParam(void)
 	// 敵の画像サイズ
 	size = { 78, 59 };
 	// 敵の移動速度
-	speed =3.0f;
+	speed =1.0f;
 
 	hp = hpMax = 3;
 }
