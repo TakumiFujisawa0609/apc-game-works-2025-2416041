@@ -45,6 +45,13 @@ void Player::GameInit(void)
 	animCounter = 0;
 	aliveFlg = true;
 	hp = PLAYER_HP_MAX;
+
+	//バフ初期化
+	buffType_ = BuffType::None;
+	buffTimer_ = 0;
+
+	healEffectTimer_ = 0;
+	lastHealAmount_ = 0;
 }
 // 更新処理
 void Player::Update(void)
@@ -52,8 +59,26 @@ void Player::Update(void)
 	animCounter++;
 	if (animCounter > (ANIM_NUMS * ANIM_INTERVAL) * 10) animCounter = 0;
 
+	//バフタイマー更新
+	if (buffTimer_ > 0)
+	{
+		buffTimer_--;
+		if (buffTimer_ <= 0)
+		{
+			buffTimer_ = 0;
+			buffType_ = BuffType::None;
+		}
+	}
+
+	if (healEffectTimer_ > 0) {
+		healEffectTimer_--;
+	}
+
 	float moveX = 0.0f;
 	float moveY = 0.0f;
+
+	//バフ込みの移動速度
+	float moveSpeed = GetMoveSpeed();
 
 	// ───────────────
 	// キーボード
@@ -116,6 +141,14 @@ void Player::Draw(void)
 		DrawBox(50 + (i * 5), Application::SCREEN_SIZE_HIG-30, 70 + (i + 5), Application::SCREEN_SIZE_WID, GetColor(255, 1, 1), true);
 	}
 
+	// 回復エフェクト表示
+	if (healEffectTimer_ > 0) {
+		int dy = (HEAL_EFFECT_TIME - healEffectTimer_) / 2; 
+		int y = playerPos.y - PLAYER_HIG / 2 - 16 - dy;
+		int x = playerPos.x - 20;
+		DrawFormatString(x, y, GetColor(0, 255, 0), "+%d", lastHealAmount_);
+	}
+
 	bullet->Draw();
 
 	
@@ -143,5 +176,50 @@ void Player::SetDamage(int dp)
 		hp = 0;
 		aliveFlg = false;
 	}
+}
+
+void Player::Heal(int amount)
+{
+	if (amount <= 0) return;
+
+	hp += amount;
+	if (hp > PLAYER_HP_MAX) {
+		hp = PLAYER_HP_MAX;
+	}
+
+	//回復演出用の情報セット
+	lastHealAmount_ = amount;
+	healEffectTimer_ = HEAL_EFFECT_TIME;
+}
+
+void Player::ApplySmallHitBuff()
+{
+	buffType_ = BuffType::SmallHit;
+	buffTimer_ = SMALL_HIT_BUFF_TIME;
+}
+
+void Player::ApplyBigHitBuff()
+{
+	buffType_ = BuffType::BigHit;
+	buffTimer_ = BIG_HIT_BUFF_TIME;
+}
+
+float Player::GetMoveSpeed() const
+{
+	float spd = static_cast<float>(MOVE_SPEED);
+
+	switch (buffType_)
+	{
+	case BuffType::SmallHit:
+		spd *= 1.5f; // 小当たり時 1.5倍
+		break;
+	case BuffType::BigHit:
+		spd *= 2.0f; // 大当たり時 2倍
+		break;
+	case BuffType::None:
+	default:
+		break;
+	}
+	return spd;
 }
 

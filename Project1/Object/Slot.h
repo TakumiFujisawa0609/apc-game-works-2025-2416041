@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "../Common/Vector2.h"
 
 // DxLib を使う前提のスロットクラス
 class Slot
@@ -13,7 +14,7 @@ public:
     // 毎フレーム呼ぶ
     void Update();
     // 毎フレーム呼ぶ（描画）
-    void Draw();
+    void Draw(const Vector2& screenPos);
     // 解放
     void Relese();
 
@@ -35,6 +36,14 @@ public:
 
     // 確変モード中か？
     bool IsInKakuhen() const;
+
+    enum class HitType
+    {
+        None,
+        Small,
+        Big,
+    };
+    HitType FetchHitType();
 
 private:
     // スロットの状態
@@ -83,5 +92,8 @@ private:
 
     // シンボルごとの画像ハンドル
     int symbolImg_[SYMBOL_COUNT];
+
+    HitType lastHitType_;
+    bool hitUsed_;
 };
 

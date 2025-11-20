@@ -61,6 +61,8 @@ void GameScene::GameInit(void)
 		delete b;
 	}
 
+	slot_.Init();
+
 	bullets.clear();
 	prevShotKey = nowShotKey = 0;
 	enCounter = 0;
@@ -78,6 +80,8 @@ void GameScene::GameInit(void)
 
 	defeatedEnemyCount_ = 0;
 	slotStarted_ = false;
+
+	slotBuffApplied_ = false;
 }
 
 // 更新処理
@@ -86,14 +90,32 @@ void GameScene::Update(void)
 	
 	InputManager::GetInstance().Update();
 
-	/*if (CheckHitKey(KEY_INPUT_J)) {
+	if (CheckHitKey(KEY_INPUT_J)) {
 		if (!slot_.IsSpinning()) {
 			slot_.Start();
+			slotBuffApplied_ = false;
 		}
 		
-	}*/
+	}
 
 	slot_.Update();
+
+	//スロットの結果による一時バフ適用
+	if (slot_.IsResult() && !slotBuffApplied_) {
+		if (slot_.IsBigHit()) {
+			// 大当たり → 強いバフ
+			player_->ApplyBigHitBuff();
+			player_->Heal(30); // HP回復も付与
+		}
+		else if (slot_.IsSmallHit()) {
+			// 小当たり → 少しだけアップ
+			player_->ApplySmallHitBuff();
+			player_->Heal(10);
+		}
+
+		// このスピンでのバフはもう適用済み
+		slotBuffApplied_ = true;
+	}
 
 	Vector2 oldPos = player_->GetPlayerPos(); // 移動前のプレイヤーの位置
 	stage_->Update();
@@ -328,7 +350,11 @@ void GameScene::Update(void)
 		}
 		// 10体倒したらスロット開始 
 		if (defeatedEnemyCount_ > 0 && defeatedEnemyCount_ % 10 == 0) {
-			if (!slot_.IsSpinning()) slot_.Start();
+			if (!slot_.IsSpinning()) {
+				slot_.Start();
+				slotBuffApplied_ = false;
+			}
+				
 		}
 	}
 	else {
@@ -374,7 +400,21 @@ void GameScene::Draw(void)
 		Application::SCREEN_SIZE_WID - SCROLL_AREA_WID, Application::SCREEN_SIZE_HIG - SCROLL_AREA_HIG,
 		GetColor(0, 0, 255), false);
 
-	slot_.Draw();
+	// スロットの描画
+	{
+		// マップの表示開始マス
+		Vector2 mapStPos = stage_->GetMapDispStPos();
+		// プレイヤーのワールド座標（中心）
+		Vector2 playerPos = player_->GetPlayerPos();
+
+		// プレイヤーの「頭あたり」のスクリーン座標
+		Vector2 slotPos;
+		slotPos.x = playerPos.x - mapStPos.x * StageBase::MAP_CHIP_SIZE_WID;
+		slotPos.y = playerPos.y - mapStPos.y * StageBase::MAP_CHIP_SIZE_HIG
+			- Player::PLAYER_HIG / 2; // 頭の少し上を基準に
+
+		slot_.Draw(slotPos);
+	}
 }
 
 // 解放処理(最後の１回のみ実行)

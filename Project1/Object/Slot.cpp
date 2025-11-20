@@ -8,6 +8,10 @@ Slot::Slot()
     , spinTimer_(0)
     , isSmallHit_(false)
     , isBigHit_(false)
+    , isVisible_(false)
+    , resultTimer_(0)
+    , lastHitType_(HitType::None)
+    , hitUsed_(true) 
 {
     result_.fill(0);
 
@@ -44,6 +48,11 @@ void Slot::Init()
     isBigHit_ = false;
     result_.fill(0);
 
+    isVisible_ = false;
+    resultTimer_ = 0;
+
+    lastHitType_ = HitType::None;
+    hitUsed_ = true;
 
 }
 
@@ -59,6 +68,9 @@ void Slot::Start()
 	isVisible_ = true;
     isSmallHit_ = false;
     isBigHit_ = false;
+
+    lastHitType_ = HitType::None;
+    hitUsed_ = true;
 
     // 回っている間の見た目用に、とりあえずランダムに回し始める
     for (int i = 0; i < REEL_COUNT; ++i)
@@ -94,29 +106,43 @@ void Slot::Update()
             JudgeHit();     // 当たり判定
 
             state_ = State::Result;
+			resultTimer_ = 0;
         }
         break;
 
     case State::Result:
-        // 結果を表示しているだけ（外側で Start されるまでこのまま）
+        resultTimer_++;
+        if (resultTimer_ >= RESULT_DISPLAY_TIME) {
+            //3秒経過したらスロットを非表示に
+            isVisible_ = false;
+            state_ = State::Idle;
+        }
+        break;
+	default:
         break;
     }
 }
 
-void Slot::Draw()
+void Slot::Draw(const Vector2& screenPos)
 {
-    // 簡易表示（あとで画像に差し替えてOK）
-    // 位置は適当に調整
-    const int baseX = 600;
-    const int baseY = 40;
+    if (!isVisible_) return;
+
+    const int totalWidth = REEL_COUNT * SYMBOL_W + (REEL_COUNT - 1) * SYMBOL_MARGIN;
+
+    int baseCenterX = screenPos.x;
+    int baseY = screenPos.y - SYMBOL_H - 16;   // 頭から 1シンボル+少し上に
+
+    // スロット全体の左端（中央揃え）
+    int baseX = baseCenterX - totalWidth / 2;
 
     const unsigned int colWhite = GetColor(255, 255, 255);
     const unsigned int colYellow = GetColor(255, 255, 0);
     const unsigned int colRed = GetColor(255, 0, 0);
 
+    // タイトル
     DrawString(baseX, baseY - 20, "SLOT", colWhite);
 
-    // 出目（数字）を表示
+    // 各リールのシンボル
     for (int i = 0; i < REEL_COUNT; ++i) {
         int symbolIndex = result_[i];
         if (symbolIndex < 0 || symbolIndex >= SYMBOL_COUNT) continue;
@@ -129,52 +155,42 @@ void Slot::Draw()
             DrawGraph(x, y, handle, TRUE);
         }
         else {
-            // 画像読み込み失敗時の保険：数字で表示
             DrawFormatString(x, y + SYMBOL_H / 2, colWhite, "%d", symbolIndex);
         }
     }
 
-    // 状態表示
+    // 状態表示（シンボルのすぐ下あたりに）
+    int stateY = baseY + SYMBOL_H + 4;
     switch (state_)
     {
     case State::Idle:
-        DrawString(baseX, baseY + 10, "IDLE", colWhite);
+        DrawString(baseX, stateY, "IDLE", colWhite);
         break;
     case State::Spinning:
-        DrawString(baseX, baseY + 10, "SPINNING...", colWhite);
+        DrawString(baseX, stateY, "SPINNING...", colWhite);
         break;
     case State::Result:
-        DrawString(baseX, baseY + 10, "RESULT", colWhite);
+        DrawString(baseX, stateY, "RESULT", colWhite);
         break;
     }
 
     // 当たり表示
-    if (isBigHit_)
-    {
-        DrawString(baseX, baseY + 30, "大当たり", colRed);
+    int hitY = stateY + 20;
+    if (isBigHit_) {
+        DrawString(baseX, hitY, "大当たり", colRed);
     }
-    else if (isSmallHit_)
-    {
-        DrawString(baseX, baseY + 30, "小当たり", colYellow);
+    else if (isSmallHit_) {
+        DrawString(baseX, hitY, "小当たり", colYellow);
     }
 
     // 確変中表示
     if (mode_ == Mode::Kakuhen)
     {
-        DrawString(baseX, baseY + 50, "確変", colYellow);
+        DrawString(baseX, hitY + 20, "確変", colYellow);
     }
 }
 void Slot::Relese()
 {
-    // 画像解放
-    for (int i = 0; i < SYMBOL_COUNT; ++i) {
-        if (symbolImg_[i] != -1) {
-            DeleteGraph(symbolImg_[i]);
-            symbolImg_[i] = -1;
-        }
-    }
-
-
 }
 bool Slot::IsSpinning() const
 {
@@ -211,6 +227,16 @@ bool Slot::IsInKakuhen() const
     return mode_ == Mode::Kakuhen;
 }
 
+Slot::HitType Slot::FetchHitType()
+{
+    if (state_ == State::Result && !hitUsed_)
+    {
+        hitUsed_ = true;
+        return lastHitType_;
+    }
+    return HitType::None;
+}
+
 // 最終的な出目を決める
 void Slot::DecideResult()
 {
@@ -228,6 +254,8 @@ void Slot::JudgeHit()
 {
     isSmallHit_ = false;
     isBigHit_ = false;
+    lastHitType_ = HitType::None;
+    hitUsed_ = false; 
 
     int a = result_[0];
     int b = result_[1];
@@ -238,6 +266,8 @@ void Slot::JudgeHit()
         // 3つ揃い → 大当たり
         isBigHit_ = true;
 
+        lastHitType_ = HitType::Big;
+
         // 将来の確変のためのフラグ
         mode_ = Mode::Kakuhen;
     }
@@ -245,6 +275,7 @@ void Slot::JudgeHit()
     {
         // どこか2つだけ揃い → 小当たり
         isSmallHit_ = true;
+        lastHitType_ = HitType::Small;
     }
     else
     {

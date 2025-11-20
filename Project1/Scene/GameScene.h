@@ -68,6 +68,8 @@ private:
     int  defeatedEnemyCount_;
     bool slotStarted_;
 
+    bool slotBuffApplied_;
+
     // ƒV[ƒ“‘JˆÚID
     E_SCENE_ID nextSceneID;
 

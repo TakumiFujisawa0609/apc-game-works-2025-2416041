@@ -17,6 +17,17 @@ public:
 	static constexpr int MOVE_SPEED = 4; // 一回の移動量
 	static constexpr int ANIM_INTERVAL = 10; // アニメーションの更新間隔
 	static constexpr int PLAYER_HP_MAX = 100; // プレイヤーのHPの最大値
+	static constexpr int SMALL_HIT_BUFF_TIME = 60 * 5;  // 小当たり 5秒
+	static constexpr int BIG_HIT_BUFF_TIME = 60 * 10; // 大当たり 10秒
+	static constexpr int HEAL_EFFECT_TIME = 30; // 回復エフェクト表示時間
+
+	//バフ種別
+	enum class BuffType
+	{
+		None,
+		SmallHit, // 小当たり用
+		BigHit,   // 大当たり用
+	};
 
 	Player(GameScene* gs);
 	~Player(void);
@@ -33,6 +44,15 @@ public:
 	int GetHp(void) { return hp; } // HPの取得
 	bool GetAlive(void) { return aliveFlg; } // 生存状態の取得
 	void SetDamage(int dp);
+
+	void Heal(int amount);
+
+	// スロット用ステータスアップ API
+	void ApplySmallHitBuff(); // 小当たりバフ
+	void ApplyBigHitBuff();   // 大当たりバフ
+
+	// 現在の移動速度（バフを加味）
+	float GetMoveSpeed() const;
 private:
 	GameScene* gInst;
 	Bullet* bullet; // 弾クラスのインスタンスのポインタ
@@ -54,5 +74,12 @@ private:
 
 	// 生存フラグ
 	bool aliveFlg;
+
+	//バフ関連
+	BuffType buffType_;
+	int buffTimer_;
+
+	int  healEffectTimer_;
+	int  lastHealAmount_;
 };
 
