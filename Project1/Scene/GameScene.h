@@ -70,6 +70,9 @@ private:
 
     bool slotBuffApplied_;
 
+    bool isPaused_;        // ポーズ中かどうか
+    int  pauseStartTime_;  // ポーズ開始時刻(ミリ秒)
+
     // シーン遷移ID
     E_SCENE_ID nextSceneID;
 

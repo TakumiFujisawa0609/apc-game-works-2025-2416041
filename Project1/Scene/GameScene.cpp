@@ -82,6 +82,9 @@ void GameScene::GameInit(void)
 	slotStarted_ = false;
 
 	slotBuffApplied_ = false;
+
+	isPaused_ = false;
+	pauseStartTime_ = 0;
 }
 
 // 更新処理
@@ -89,6 +92,34 @@ void GameScene::Update(void)
 {
 	
 	InputManager::GetInstance().Update();
+
+	{
+		static bool prevEsc = false;
+		bool nowEsc = (CheckHitKey(KEY_INPUT_ESCAPE) != 0);
+		bool trigEsc = (nowEsc && !prevEsc);
+		prevEsc = nowEsc;
+
+		if (trigEsc) {
+			if (!isPaused_) {
+				// ポーズに入る
+				isPaused_ = true;
+				pauseStartTime_ = GetNowCount();
+			}
+			else {
+				// ポーズ解除
+				isPaused_ = false;
+				int paused = GetNowCount() - pauseStartTime_;
+				// ポーズしていた分だけスタート時間をずらして
+				// 残り時間が減らないようにする
+				startTime += paused;
+			}
+		}
+	}
+
+	// ポーズ中はここでゲーム処理を止める
+	if (isPaused_) {
+		return;
+	}
 
 	if (CheckHitKey(KEY_INPUT_J)) {
 		if (!slot_.IsSpinning()) {

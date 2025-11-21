@@ -36,4 +36,6 @@ private:
 	};
 
 	ON_OFF gamePause;
+
+	void DrawPauseMenu();
 };

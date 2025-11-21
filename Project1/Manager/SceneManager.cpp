@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "SceneManager.h"
+#include "../Application.h"
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
