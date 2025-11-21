@@ -2,7 +2,6 @@
 #include <array>
 #include "../Common/Vector2.h"
 
-// DxLib を使う前提のスロットクラス
 class Slot
 {
 public:
@@ -36,6 +35,9 @@ public:
 
     // 確変モード中か？
     bool IsInKakuhen() const;
+
+    // 残り確変ゲーム数を取得
+    int GetKakuhenGamesLeft() const { return kakuhenGamesLeft_; }
 
     enum class HitType
     {

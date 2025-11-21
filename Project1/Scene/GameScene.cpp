@@ -69,7 +69,7 @@ void GameScene::GameInit(void)
 	nextSceneID = E_SCENE_GAME;
 
 	startTime = GetNowCount();
-	limitTime = 50000;
+	limitTime = 90000;      //制限時間
 	isClear = false;
 
 	autoShotTimer_ = 0;
@@ -248,9 +248,22 @@ void GameScene::Update(void)
 		enemys[ii]->Update();
 	}
 
-	// エンカウンター
-	if (stage_->GetMapType() == StageBase::MAP_TYPE::E_MIYPE_GROUND)enCounter++;
-	if (enCounter > ENCOUNT) {
+	// エンカウンター（時間経過で出現間隔を短くする）
+	if (stage_->GetMapType() == StageBase::MAP_TYPE::E_MIYPE_GROUND) {
+		enCounter++;
+	}
+
+	// 経過時間（ミリ秒）
+	int elapsedMs = GetNowCount() - startTime;
+
+	// 例：10秒ごとに ENCOUNT を 2 ずつ減らす（下限 10）
+	int level = elapsedMs / 10000;          // 0?
+	int currentEncount = ENCOUNT - level * 2;
+	if (currentEncount < 10) {
+		currentEncount = 10;                // 出現間隔の最小値
+	}
+
+	if (enCounter > currentEncount) {
 
 		// 敵の生成
 		Enemy* e = nullptr;
@@ -267,21 +280,20 @@ void GameScene::Update(void)
 		case Enemy::ENEMY_TYPE::E_TYPE_EYE:
 			e = new Eenmy_eye();
 			break;
-		/*case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
-			e = new Enemy_GoblinRun();
-			break;
-		case Enemy::ENEMY_TYPE::E_TYPE_MUSHROOM:
-			e = new Enemy_Mushroom();
-			break;
-		case Enemy::ENEMY_TYPE::E_TYPE_SKELETON:
-			e = new Enemy_Skeleton();
-			break;*/
+			/*case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
+				e = new Enemy_GoblinRun();
+				break;
+			case Enemy::ENEMY_TYPE::E_TYPE_MUSHROOM:
+				e = new Enemy_Mushroom();
+				break;
+			case Enemy::ENEMY_TYPE::E_TYPE_SKELETON:
+				e = new Enemy_Skeleton();
+				break;*/
 		}
 
 		if (e != nullptr) {
 			e->SystemInit(this);
 			e->GameInit();
-			// 可変長配列に要素を追加する
 			enemys.push_back(e);
 			enCounter = 0; // エンカウンターをリセット
 		}
@@ -394,6 +406,16 @@ void GameScene::Draw(void)
 		pPos.x, pPos.y, mPos.x, mPos.y);
 	int num = (int)enemys.size();
 	DrawFormatString(0, 48, GetColor(0xff, 0xff, 0xff), "敵の数：%d", num);
+
+	//確変中なら残りゲーム数を表示
+	if (slot_.IsInKakuhen()) {
+		DrawFormatString(
+			0, 64,
+			GetColor(255, 255, 0),    // 黄色
+			"KAKUHEN 残り %dG",
+			slot_.GetKakuhenGamesLeft()
+		);
+	}
 	//-----------------------------------------------------------------------
 	// 画面のスクロール範囲(デバッグ用)
 	DrawBox(SCROLL_AREA_WID, SCROLL_AREA_HIG,
