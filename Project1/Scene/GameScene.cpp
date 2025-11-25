@@ -311,7 +311,7 @@ void GameScene::Update(void)
 		case Enemy::ENEMY_TYPE::E_TYPE_EYE:
 			e = new Eenmy_eye();
 			break;
-			/*case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
+		/*	case Enemy::ENEMY_TYPE::E_TYPE_GOBLIN:
 				e = new Enemy_GoblinRun();
 				break;
 			case Enemy::ENEMY_TYPE::E_TYPE_MUSHROOM:

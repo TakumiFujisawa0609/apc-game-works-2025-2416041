@@ -10,5 +10,5 @@ void Enemynormal::SetEnemyParam(void)
 	// “G‚ÌˆÚ“®‘¬“x
 	speed =1.0f;
 
-	hp = hpMax = 3;
+	hp = hpMax = 5;
 }
