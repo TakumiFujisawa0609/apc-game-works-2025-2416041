@@ -33,7 +33,7 @@ Application::~Application(void)
 bool Application::SystemInit(void)
 {
 	//システム処理
-	SetWindowText("2416041 守口太一朗");
+	SetWindowText("Slot Survivor");
 	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);
 	//ゲームウインドウのサイズと色モードを設定
 	ChangeWindowMode(true);

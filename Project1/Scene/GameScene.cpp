@@ -121,13 +121,13 @@ void GameScene::Update(void)
 		return;
 	}
 
-	if (CheckHitKey(KEY_INPUT_J)) {
+	/*if (CheckHitKey(KEY_INPUT_J)) {
 		if (!slot_.IsSpinning()) {
 			slot_.Start();
 			slotBuffApplied_ = false;
 		}
 		
-	}
+	}*/
 
 	slot_.Update();
 
@@ -422,21 +422,21 @@ void GameScene::Draw(void)
 
 	for (auto& b : bullets) b->Draw();
 
-	DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
-	int php = player_->GetHp();
-	// 残り時間を表示
-	int elapsed = GetNowCount() - startTime;
-	int remain = max(0, limitTime - elapsed);
-	DrawFormatString(300, 0, GetColor(255, 255, 255),
-		"残り時間：%.2f秒", remain / 1000.0f);
-	//-----------------------------------------------------------------------
-	// デバッグ用
-	Vector2 pPos = player_->GetPlayerPos();
-	Vector2 mPos = WorldPos2MapPos(pPos);
-	DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "プレイヤー座標：(%d, %d)→(%d, %d)",
-		pPos.x, pPos.y, mPos.x, mPos.y);
-	int num = (int)enemys.size();
-	DrawFormatString(0, 48, GetColor(0xff, 0xff, 0xff), "敵の数：%d", num);
+	//DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
+	//int php = player_->GetHp();
+	//// 残り時間を表示
+	//int elapsed = GetNowCount() - startTime;
+	//int remain = max(0, limitTime - elapsed);
+	//DrawFormatString(300, 0, GetColor(255, 255, 255),
+	//	"残り時間：%.2f秒", remain / 1000.0f);
+	////-----------------------------------------------------------------------
+	//// デバッグ用
+	//Vector2 pPos = player_->GetPlayerPos();
+	//Vector2 mPos = WorldPos2MapPos(pPos);
+	//DrawFormatString(0, 32, GetColor(0xff, 0xff, 0xff), "プレイヤー座標：(%d, %d)→(%d, %d)",
+	//	pPos.x, pPos.y, mPos.x, mPos.y);
+	//int num = (int)enemys.size();
+	//DrawFormatString(0, 48, GetColor(0xff, 0xff, 0xff), "敵の数：%d", num);
 
 	//確変中なら残りゲーム数を表示
 	if (slot_.IsInKakuhen()) {
@@ -449,9 +449,9 @@ void GameScene::Draw(void)
 	}
 	//-----------------------------------------------------------------------
 	// 画面のスクロール範囲(デバッグ用)
-	DrawBox(SCROLL_AREA_WID, SCROLL_AREA_HIG,
+	/*DrawBox(SCROLL_AREA_WID, SCROLL_AREA_HIG,
 		Application::SCREEN_SIZE_WID - SCROLL_AREA_WID, Application::SCREEN_SIZE_HIG - SCROLL_AREA_HIG,
-		GetColor(0, 0, 255), false);
+		GetColor(0, 0, 255), false);*/
 
 	// スロットの描画
 	{

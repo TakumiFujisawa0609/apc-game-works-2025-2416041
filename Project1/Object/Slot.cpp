@@ -35,7 +35,6 @@ void Slot::Init()
     };
 
     for (int i = 0; i < SYMBOL_COUNT; ++i) {
-        // ここで PATH_SLOT と結合する
         std::string path = Application::PATH_SLOT + fileNames[i];
         symbolImg_[i] = LoadGraph(path.c_str());
     }
@@ -147,7 +146,7 @@ void Slot::Draw(const Vector2& screenPos)
     const int totalWidth = REEL_COUNT * SYMBOL_W + (REEL_COUNT - 1) * SYMBOL_MARGIN;
 
     int baseCenterX = screenPos.x;
-    int baseY = screenPos.y - SYMBOL_H - 16;   // 頭から 1シンボル+少し上に
+    int baseY = screenPos.y - SYMBOL_H - 16; 
 
     // スロット全体の左端（中央揃え）
     int baseX = baseCenterX - totalWidth / 2;
@@ -156,8 +155,8 @@ void Slot::Draw(const Vector2& screenPos)
     const unsigned int colYellow = GetColor(255, 255, 0);
     const unsigned int colRed = GetColor(255, 0, 0);
 
-    // タイトル
-    DrawString(baseX, baseY - 20, "SLOT", colWhite);
+    //// タイトル
+    //DrawString(baseX, baseY - 20, "SLOT", colWhite);
 
     // 各リールのシンボル
     for (int i = 0; i < REEL_COUNT; ++i) {
