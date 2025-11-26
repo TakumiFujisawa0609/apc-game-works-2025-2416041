@@ -12,3 +12,4 @@ void Enemynormal::SetEnemyParam(void)
 
 	hp = hpMax = 5;
 }
+  
