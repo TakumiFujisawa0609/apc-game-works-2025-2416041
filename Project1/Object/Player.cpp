@@ -207,6 +207,7 @@ void Player::ApplyBigHitBuff()
 float Player::GetMoveSpeed() const
 {
 	float spd = static_cast<float>(MOVE_SPEED);
+	
 
 	switch (buffType_)
 	{
