@@ -46,6 +46,6 @@ public:
 
 private:
 
-	SceneManager* sceneMana; // シーンマネージャーのインスタンスのポインタ
+	SceneManager* sceneManager; // シーンマネージャーのインスタンスのポインタ
 };
 

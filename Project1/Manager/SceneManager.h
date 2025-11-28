@@ -14,6 +14,8 @@ public:
 	void Update(void); // 更新処理
 	void Draw(void); // 描画処理
 	bool Release(void); // 解放処理(最後の１回のみ実行)
+
+	bool IsGameEnd() const { return isGameEnd; }
 private:
 	Fader* fader; // フェードクラスのインスタンスのポインタ
 	TitleScene* titleInst; // タイトルシーンクラスのインスタンスのポインタ
@@ -35,7 +37,16 @@ private:
 		PAUSE
 	};
 
+	enum class PAUSE_SELECT
+	{
+		RESUME = 0,   // ゲームに戻る
+		EXIT_GAME,    // ゲーム終了
+		MAX           // 個数
+	};
+
 	ON_OFF gamePause;
+	PAUSE_SELECT pauseSelect;  
+	bool isGameEnd;    
 
 	void DrawPauseMenu();
 };

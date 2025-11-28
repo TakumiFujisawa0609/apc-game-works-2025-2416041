@@ -1,8 +1,8 @@
 #pragma once
-
 #include "../../StDefineData.h"
 #include "../../Common/Vector2.h"
 #include "../../Application.h"
+#include"../GameScene.h"
 
 class StageBase
 {

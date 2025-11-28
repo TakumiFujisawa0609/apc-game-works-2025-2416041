@@ -2,8 +2,9 @@
 #pragma once
 #include "../Application.h"
 #include "../StDefineData.h"
+#include"../Scene/GameScene.h"
 
-class GameOverScene
+class GameOverScene : public GameScene
 {
 public:
 	static constexpr int GAMEOVER_SIZE_WID = 800; // ゲームオーバー画像の横サイズ

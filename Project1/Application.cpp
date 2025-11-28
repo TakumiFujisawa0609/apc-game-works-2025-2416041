@@ -20,7 +20,7 @@ const std::string Application::PATH_MOVIE = PATH_DATA + "Movie/"; // “®‰æ‚ÌƒpƒX
 //ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 Application::Application(void)
 {
-	sceneMana = nullptr;
+	sceneManager = nullptr;
 }
 
 //ƒfƒXƒgƒ‰ƒNƒ^
@@ -36,7 +36,7 @@ bool Application::SystemInit(void)
 	SetWindowText("Slot Survivor");
 	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);
 	//ƒQ[ƒ€ƒEƒCƒ“ƒhƒE‚ÌƒTƒCƒY‚ÆFƒ‚[ƒh‚ðÝ’è
-	ChangeWindowMode(true);
+	ChangeWindowMode(false);
 
 	if (DxLib_Init() == -1) return false;
 
@@ -47,10 +47,10 @@ bool Application::SystemInit(void)
 	InputManager::GetInstance().Init();
 
 	// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
-	sceneMana = new SceneManager();
-	if (sceneMana == nullptr)return false;
+	sceneManager = new SceneManager();
+	if (sceneManager == nullptr)return false;
 
-	sceneMana->SystemInit();
+	sceneManager->SystemInit();
 
 	return true;
 }
@@ -58,9 +58,13 @@ bool Application::SystemInit(void)
 // ƒQ[ƒ€‹N“®
 void Application::Run(void)
 {
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_1) == 0) {
+	while (ProcessMessage() == 0) {
 		Update(); // XV
 		Draw(); // •`‰æ
+
+		if (sceneManager->IsGameEnd()) {
+			break;
+		}
 	}
 }
 
@@ -68,7 +72,7 @@ void Application::Run(void)
 void Application::Update(void)
 {
 	InputManager::GetInstance().Update(); // “ü—Íî•ñ‚ÌXV
-	sceneMana->Update();
+	sceneManager->Update();
 }
 // •`‰æ
 void Application::Draw(void)
@@ -76,7 +80,7 @@ void Application::Draw(void)
 	SetDrawScreen(DX_SCREEN_BACK); // •`‰æ‚·‚é‰æ–Ê‚ð— ‚Ì‰æ–Ê‚ÉÝ’è‚·‚é
 	ClearDrawScreen(); // •`‰æ‚·‚é‰æ–Ê‚Ì“à—e‚ðÁ‹Ž(ƒNƒŠƒA)‚·‚é
 
-	sceneMana->Draw();
+	sceneManager->Draw();
 
 	ScreenFlip(); // — ‰æ–Ê‚Æ•\‰æ–Ê‚ð“ü‚ê‘Ö‚¦‚é
 }
@@ -85,10 +89,10 @@ void Application::Draw(void)
 bool Application::Release(void)
 {
 	InputManager::GetInstance().Destroy();
-	sceneMana->Release();
+	sceneManager->Release();
 
-	delete sceneMana;
-	sceneMana = nullptr;
+	delete sceneManager;
+	sceneManager = nullptr;
 
 	if (DxLib_End() == -1)return false;
 	return true;

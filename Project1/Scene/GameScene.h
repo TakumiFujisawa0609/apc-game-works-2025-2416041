@@ -5,6 +5,8 @@
 #include "../Common/Vector2.h"
 #include "../StDefineData.h"
 #include "../Object/Slot.h"
+#include "../Manager/SoundManager.h"
+
 
 
 
@@ -75,6 +77,8 @@ private:
 
     // ƒV[ƒ“‘JˆÚID
     E_SCENE_ID nextSceneID;
+
+    SoundManager& sound = SoundManager::GetInstance();
 
     // “à•”ˆ—ŠÖ”
     void MapScrollProc(void);

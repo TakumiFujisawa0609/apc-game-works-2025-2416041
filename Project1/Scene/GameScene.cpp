@@ -424,11 +424,11 @@ void GameScene::Draw(void)
 
 	//DrawBox(0, 0, Application::SCREEN_SIZE_WID, 20, GetColor(0, 0, 0), true);
 	//int php = player_->GetHp();
-	//// 残り時間を表示
-	//int elapsed = GetNowCount() - startTime;
-	//int remain = max(0, limitTime - elapsed);
-	//DrawFormatString(300, 0, GetColor(255, 255, 255),
-	//	"残り時間：%.2f秒", remain / 1000.0f);
+	// 残り時間を表示
+	int elapsed = GetNowCount() - startTime;
+	int remain = max(0, limitTime - elapsed);
+	DrawFormatString(300, 0, GetColor(255, 255, 255),
+		"残り時間：%.2f秒", remain / 1000.0f);
 	////-----------------------------------------------------------------------
 	//// デバッグ用
 	//Vector2 pPos = player_->GetPlayerPos();

@@ -1,7 +1,9 @@
 #pragma once
 #include "GameScene.h"
 #include "../StDefineData.h"
-class TitleScene
+
+
+class TitleScene : public GameScene
 {
 public:
 	static constexpr int TITLE_SIZE_WID = 800;
