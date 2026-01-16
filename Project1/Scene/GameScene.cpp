@@ -121,13 +121,13 @@ void GameScene::Update(void)
 		return;
 	}
 
-	/*if (CheckHitKey(KEY_INPUT_J)) {
+	if (CheckHitKey(KEY_INPUT_J)) {
 		if (!slot_.IsSpinning()) {
 			slot_.Start();
 			slotBuffApplied_ = false;
 		}
 		
-	}*/
+	}
 
 	slot_.Update();
 
